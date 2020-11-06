@@ -22,7 +22,7 @@ namespace SimpleSDL
 	public:
 		Image() = delete;
 		Image(int x, int y, int z, int w, int h, float alpha, std::string filePath);
-		~Image() = default;
+		~Image();
 
 		void free();
 
@@ -89,9 +89,11 @@ namespace SimpleSDL
 	class TTF
 	{
 	public:
-		TTF() = delete;
+		TTF() = default;
 		TTF(int x, int y, int fontSize, Uint8 r, Uint8 g, Uint8 b, Uint8 a, std::string fontLocation, std::string text);
-		~TTF() = default;
+		TTF(const TTF& other);
+		
+		~TTF();
 
 		void free();
 
@@ -123,10 +125,13 @@ namespace SimpleSDL
 		int y;
 		int textWidth;
 		int textHeight;
+		int fontSize;
 		Uint8 r;
 		Uint8 g;
 		Uint8 b;
 		Uint8 a;
+		std::string filePath;
+		std::string text;
 		bool loadText(std::string text, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 		
 	};
@@ -149,15 +154,15 @@ namespace SimpleSDL
 			chunk = Mix_LoadWAV(wavLoc.c_str());
 			Mix_VolumeChunk(chunk, volume);
 		}
-		~WAV() = default;
+		~WAV()
+		{
+			Mix_FreeChunk(chunk);
+		}
 		void play()
 		{
 			Mix_PlayChannel(0, chunk, 0);
 		}
-		void free()
-		{
-			Mix_FreeChunk(chunk);
-		}
+		
 	private:
 		Mix_Chunk* chunk;
 	};
@@ -172,12 +177,11 @@ namespace SimpleSDL
 			setVolume(volume);
 			Mix_PlayMusic(music, -1);
 		}
-		~Music() = default;
-
-		void free()
+		~Music()
 		{
 			Mix_FreeMusic(music);
 		}
+
 		void pause()
 		{
 			Mix_PauseMusic();
@@ -204,7 +208,7 @@ namespace SimpleSDL
 	class EditBox
 	{
 	public:
-		EditBox(int x,int y, int w,int h, std::string fontLoc):container(x, y+h/8, h/2, 0, 0, 0, 255, fontLoc.c_str(), "")
+		EditBox(int x,int y, int w,int h, std::string fontLoc):container(x, y + h / 8, h / 2, 0, 0, 0, 255, fontLoc.c_str(), "")
 		{
 			this->x = x;
 			this->y = y;
@@ -213,22 +217,23 @@ namespace SimpleSDL
 			caretX = x;
 			content = "";
 			isFocused = false;
+			boxes.push_back(*this);
 		}
 		~EditBox() = default;
 		void handleEvent(SDL_Event&e)
 		{
 			if (e.type == SDL_MOUSEBUTTONDOWN)
 			{
-				/*int mx, my;
+				int mx, my;
 				SDL_GetMouseState(&mx, &my);
 				if ((mx > x && mx < x + boxWidth) && (my > y && my < y + boxHeight))
 				{
-					for (auto& box : editBoxes)
+					for (auto& box : boxes)
 					{
 						box.setFocused(false);
 					}
 					isFocused = true;
-				}*/
+				}
 			}
 			else if (isFocused&&e.type==SDL_KEYDOWN&&e.key.keysym.sym == SDLK_BACKSPACE && content.length() > 0)
 			{
@@ -274,6 +279,7 @@ namespace SimpleSDL
 		{
 			return content;
 		}
+		static std::vector<EditBox> boxes;
 	private:
 		int x;
 		int y;

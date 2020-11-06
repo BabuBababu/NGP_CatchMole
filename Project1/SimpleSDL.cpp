@@ -7,6 +7,7 @@ SDL_Window* SimpleSDL::gWindow = nullptr;
 //The window renderer
 SDL_Renderer* SimpleSDL::gRenderer = nullptr;
 
+std::vector<SimpleSDL::EditBox> SimpleSDL::EditBox::boxes;
 
 bool SimpleSDL::init(int windowWidth, int windowHeight)
 {
@@ -124,6 +125,11 @@ SimpleSDL::Image::Image(int x, int y, int z, int w, int h, float alpha, std::str
 
 }
 
+SimpleSDL::Image::~Image()
+{
+	SDL_DestroyTexture(texture);
+}
+
 void SimpleSDL::Image::free()
 {
 	SDL_DestroyTexture(texture);
@@ -147,14 +153,40 @@ SimpleSDL::TTF::TTF(int x, int y, int fontSize, Uint8 r, Uint8 g, Uint8 b, Uint8
 {
 	this->x = x;
 	this->y = y;
+	this->fontSize = fontSize;
 	font = TTF_OpenFont(fontLocation.c_str(), fontSize);
 	this->r = r;
 	this->g = g;
 	this->b = b;
 	this->a = a;
+	this->filePath = fontLocation;
+	this->text = text;
 	texture = nullptr;
 	loadText(text, r, g, b, a);
 
+}
+
+SimpleSDL::TTF::TTF(const TTF& other)
+{
+	x = other.x;
+	y = other.y;
+	fontSize = other.fontSize;
+	r = other.r;
+	g = other.g;
+	b = other.b;
+	filePath = other.filePath;
+	text = other.text;
+	font = TTF_OpenFont(filePath.c_str(), fontSize);
+	texture = nullptr;
+	loadText(text, r, g, b, a);
+}
+
+SimpleSDL::TTF::~TTF()
+{
+	TTF_CloseFont(font);
+	font = nullptr;
+	SDL_DestroyTexture(texture);
+	texture = nullptr;
 }
 
 void SimpleSDL::TTF::free()

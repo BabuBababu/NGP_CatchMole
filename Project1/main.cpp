@@ -10,16 +10,18 @@ int main(int argc, char* args[])
 
 	
 	//SimpleSDL::TTF text = SimpleSDL::TTF(100, 100, 100, 255, 0, 0, 255, "test1.ttf", "Hello World");
-
 	//SimpleSDL::Image jaeo = SimpleSDL::Image(100, 100, 0, 0, 0, 255, "test.png");
-	
-	//SimpleSDL::EditBox(100, 100, 200, 50, "test2.ttf");
-	//SimpleSDL::EditBox(100, 200, 200, 50, "test2.ttf");
-	//SimpleSDL::EditBox(100, 300, 200, 50, "test2.ttf");
-	
-	SimpleSDL::WAV effect = SimpleSDL::WAV("test.wav", SimpleSDL::SOUNDVOLUME::LARGE);
-	SimpleSDL::Music bgMusic = SimpleSDL::Music("test.mp3", SimpleSDL::SOUNDVOLUME::LARGE);
-	effect.play();
+	//std::vector<SimpleSDL::EditBox> boxes;
+	//boxes.emplace_back(100, 100, 200, 50, "test2.ttf");
+	//boxes.emplace_back(100, 300, 200, 50, "test2.ttf");
+	//boxes.emplace_back(100, 500, 200, 50, "test2.ttf");
+	SimpleSDL::EditBox(100, 100, 200, 50, "test2.ttf");
+	SimpleSDL::EditBox(100, 300, 200, 50, "test2.ttf");
+	SimpleSDL::EditBox(100, 500, 200, 50, "test2.ttf");
+
+	//SimpleSDL::WAV effect = SimpleSDL::WAV("test.wav", SimpleSDL::SOUNDVOLUME::LARGE);
+	//SimpleSDL::Music bgMusic = SimpleSDL::Music("test.mp3", SimpleSDL::SOUNDVOLUME::LARGE);
+	//effect.play();
 	bool quit = false;
 	SDL_Event e;
 	//Handle events on queue
@@ -36,12 +38,15 @@ int main(int argc, char* args[])
 			{
 				quit = true;
 			}
-			
+			for (auto& box : SimpleSDL::EditBox::boxes)
+			{
+				box.handleEvent(e);
+			}
 		}
 
 		SDL_RenderClear(SimpleSDL::gRenderer);
-
-
+		for (auto& box : SimpleSDL::EditBox::boxes)
+			box.draw();
 		SDL_RenderPresent(SimpleSDL::gRenderer);
 	}
 	
