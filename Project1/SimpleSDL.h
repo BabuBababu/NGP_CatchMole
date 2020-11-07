@@ -21,7 +21,8 @@ namespace SimpleSDL
 	{
 	public:
 		Image() = delete;
-		Image(int x, int y, int z, int w, int h, float alpha, std::string filePath);
+		Image(int x, int y, int z, int w, int h, int alpha, std::string filePath);
+		Image(const Image& other);
 		~Image();
 
 		void free();
@@ -148,7 +149,7 @@ namespace SimpleSDL
 	class WAV
 	{
 	public:
-		WAV() = delete;
+		WAV() = default;
 		WAV(std::string wavLoc, SOUNDVOLUME volume)
 		{
 			chunk = Mix_LoadWAV(wavLoc.c_str());
@@ -170,7 +171,7 @@ namespace SimpleSDL
 	class Music
 	{
 	public:
-		Music() = delete;
+		Music() = default;
 		Music(std::string musicLoc, SOUNDVOLUME volume)
 		{
 			music = Mix_LoadMUS(musicLoc.c_str());
@@ -180,6 +181,7 @@ namespace SimpleSDL
 		~Music()
 		{
 			Mix_FreeMusic(music);
+			music = nullptr;
 		}
 
 		void pause()
@@ -208,6 +210,7 @@ namespace SimpleSDL
 	class EditBox
 	{
 	public:
+		EditBox() = default;
 		EditBox(int x,int y, int w,int h, std::string fontLoc):container(x, y + h / 8, h / 2, 0, 0, 0, 255, fontLoc.c_str(), "")
 		{
 			this->x = x;
@@ -218,6 +221,17 @@ namespace SimpleSDL
 			content = "";
 			isFocused = false;
 			boxes.push_back(*this);
+		}
+		EditBox(const EditBox& other)
+		{
+			x = other.x;
+			y = other.y;
+			boxWidth = other.boxWidth;
+			boxHeight = other.boxHeight;
+			caretX = other.caretX;
+			content = other.content;
+			isFocused = other.isFocused;
+			this->container = other.container;
 		}
 		~EditBox() = default;
 		void handleEvent(SDL_Event&e)

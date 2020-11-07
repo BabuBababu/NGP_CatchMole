@@ -13,13 +13,15 @@ public:
 };
 
 
-class InitScene: public Scene
+class TestScene: public Scene
 {
-	InitScene() :Scene()
-	{
-		//이곳에 게임에서 사용할 오브젝트를 추가한다.
-	}
+public:
+	TestScene();
+	~TestScene();
 	void render() override;
 	void update() override;
 	void handleEvnet(SDL_Event& e) override;
+private:
+	std::vector<SimpleSDL::WAV>tests;
+	SimpleSDL::Music musik;
 };

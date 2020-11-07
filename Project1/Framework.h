@@ -1,7 +1,8 @@
 #pragma once
 #include <chrono>
+#include "SimpleSDL.h"
+#include "Scene.h"
 
-class Scene;
 class Communicator;
 
 struct ClientToServer
@@ -23,14 +24,14 @@ struct GameSate
 class Framework
 {
 public:
-	Framework();
+	Framework(Scene* initScene);
 	~Framework();
 	void render();
 	void communicateWithServ();
 	void updateScene();
-	void handleEvent();
-	void update();
-	void changeScene();
+	bool handleEvent();
+	bool update();
+	void changeScene(Scene* scene);
 private:
 	Scene* curScene;
 	Communicator* communicator;

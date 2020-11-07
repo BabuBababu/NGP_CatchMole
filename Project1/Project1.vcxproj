@@ -143,10 +143,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Framework.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleSDL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Framework.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleSDL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

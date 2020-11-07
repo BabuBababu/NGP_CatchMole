@@ -94,7 +94,7 @@ void SimpleSDL::quit()
 }
 
 
-SimpleSDL::Image::Image(int x, int y, int z, int w, int h, float alpha, std::string filePath)
+SimpleSDL::Image::Image(int x, int y, int z, int w, int h, int alpha, std::string filePath)
 {
 	texture = nullptr;
 
@@ -124,6 +124,7 @@ SimpleSDL::Image::Image(int x, int y, int z, int w, int h, float alpha, std::str
 	this->alpha = alpha;
 
 }
+
 
 SimpleSDL::Image::~Image()
 {
