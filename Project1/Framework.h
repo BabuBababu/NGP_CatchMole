@@ -1,25 +1,7 @@
 #pragma once
-#include <chrono>
-#include "SimpleSDL.h"
 #include "Scene.h"
-
-class Communicator;
-
-struct ClientToServer
-{
-	int clikedHole;
-	std::chrono::steady_clock::time_point clikedTime;
-};
-
-struct GameSate
-{
-	int remainingTime;
-	int p1Point;
-	int p2Point;
-	int p1HammerFrame;
-	int p2HammerFrame;
-	std::pair<int, float> molespos[9];
-};
+#include "Communicator.h"
+#include "SimpleSDL.h"
 
 class Framework
 {
@@ -29,6 +11,7 @@ public:
 	void render();
 	void communicateWithServ();
 	void updateScene();
+	bool connectingToServ(const std::string&servAddr,const std::string& portNum );
 	bool handleEvent();
 	bool update();
 	void changeScene(Scene* scene);
@@ -39,3 +22,4 @@ private:
 	GameSate* gs;
 };
 
+extern Framework* gFramework;

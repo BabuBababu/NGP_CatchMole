@@ -143,12 +143,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Communicator.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SimpleSDL.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Communicator.h" />
     <ClInclude Include="Framework.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SimpleSDL.h" />

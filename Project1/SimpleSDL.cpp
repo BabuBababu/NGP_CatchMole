@@ -1,6 +1,5 @@
 #include "SimpleSDL.h"
 
-
 //The window we'll be rendering to
 SDL_Window* SimpleSDL::gWindow = nullptr;
 
