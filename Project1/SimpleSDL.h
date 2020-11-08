@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 namespace SimpleSDL
 {
 	//The window we'll be rendering to
