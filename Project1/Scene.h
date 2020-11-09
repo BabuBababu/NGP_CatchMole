@@ -25,4 +25,5 @@ private:
 	std::vector<SimpleSDL::WAV>tests;
 	SimpleSDL::Music musik;
 	SimpleSDL::Image Zergling;
+	std::vector<SimpleSDL::Image>Hydra;
 };

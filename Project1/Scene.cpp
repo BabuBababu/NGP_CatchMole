@@ -1,14 +1,10 @@
 #include "Scene.h"
 
-TestScene::TestScene():musik("test.mp3", SimpleSDL::SOUNDVOLUME::MEDIUM)
+TestScene::TestScene():musik("test.mp3", SimpleSDL::SOUNDVOLUME::MEDIUM), Zergling(0, 0, 0, 0, 0, 0, "resource/Zergling (1).png")
 {
 	tests.emplace_back("test.wav", SimpleSDL::SOUNDVOLUME::MEDIUM);
+	//Hydra.emplace_back(0, 0, 0, 0, 0, 0, "resource/Zergling (1).png");
 }
-TestScene::TestScene() : Zergling(0, 0, 0, 0, 0, 0, "Zergling(1).png")
-{
-
-}
-
 TestScene::~TestScene()
 {
 
@@ -16,7 +12,11 @@ TestScene::~TestScene()
 
 void TestScene::render()
 {
-	Zergling.draw();
+	//Zergling.draw();
+	/*for (auto & img : Hydra)
+	{
+		img.draw();
+	}*/
 }
 
 void TestScene::update()
