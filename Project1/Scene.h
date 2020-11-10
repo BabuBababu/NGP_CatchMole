@@ -42,10 +42,10 @@ private:
 	SimpleSDL::EditBox portBox;
 	SimpleSDL::EditBox ipaddrBox;
 	//서버포트랑 ip주소 입력할 변수 2개
-	std::string portNum;
-	std::string ipaddr;
+	std::string portNum = "0";
+	std::string ipaddr = "0";
 	// 버튼용 이미지 2개, 뒷 배경 1개
 	SimpleSDL::Image BG;
-	SimpleSDL::Image upButton;
-	SimpleSDL::Image downButton;
+	SimpleSDL::Image falseButton;
+	SimpleSDL::Image trueButton;
 };
