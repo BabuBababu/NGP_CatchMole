@@ -42,12 +42,13 @@ void InitScene::render()
 
 void InitScene::update()
 {
+	portNum = portBox.getContent();
+	ipaddr = ipaddrBox.getContent();
 }
 
 void InitScene::handleEvnet(SDL_Event& e)
-{ //이부분 부터 절대 지우지마셈!!! 
-	portNum = portBox.getContent();
-	ipaddr = ipaddrBox.getContent();
+{
+	//이부분부터 절대 지우지마셈!!! 
 	
 	if (e.type == SDL_MOUSEBUTTONDOWN)
 	{
