@@ -55,7 +55,7 @@ void InitScene::handleEvnet(SDL_Event& e)
 		SDL_GetMouseState(&x, &y);
 		if ((540 < x < 640) && (580 < y < 630))
 		{
-			//mainscene으로 넘어가기 구현
+			//먼저 서버에 portNum과 ipaddr 값을 보내주고 mainscene으로 넘어가기 구현 
 			
 			
 		}
@@ -63,4 +63,26 @@ void InitScene::handleEvnet(SDL_Event& e)
 	else if (e.type == SDL_MOUSEBUTTONUP)
 	{
 	}
+}
+
+
+
+MainScene::MainScene()
+{
+}
+
+MainScene::~MainScene()
+{
+}
+
+void MainScene::render()
+{
+}
+
+void MainScene::update()
+{
+}
+
+void MainScene::handleEvnet(SDL_Event& e)
+{
 }
