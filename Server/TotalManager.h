@@ -1,4 +1,6 @@
 #pragma once
+#pragma comment(lib, "ws2_32")
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
 #include <vector>
 #include <thread>
@@ -27,7 +29,7 @@ class TotalManager
 public:
 	TotalManager();
 	~TotalManager();
-	static void gameLogicThread();
+	static bool gameLogicThread();
 	static void clntProcessingThread(int threadID);
 	//이 함수들은 나중에 구현할 예정임.
 private:
@@ -37,6 +39,6 @@ private:
 	std::atomic<bool> isLogicThreadCompleted;
 	std::atomic<bool> recvPacketFromClnt[2];
 	GameState* gs;
-	ClientToServer* cs;
+	ClientToServer* ctos;
+	static int portNumber;
 };
-
