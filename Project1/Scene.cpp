@@ -2,10 +2,11 @@
 
 
 
-InitScene::InitScene() :portBox(600, 300, 400, 50, "test1.ttf"), ipaddrBox(600, 400, 400, 50, "test1.ttf")
-{//√ ±‚»≠ EditBox(int x,int y, int w,int h, std::string fontLoc):container(x, y + h / 8, h / 2, 0, 0, 0, 255, fontLoc.c_str(), "")
-	upButton = SimpleSDL::Image(640, 550, 0, 0, 0, 255, "resource/Hydra (1).png");
-	downButton = SimpleSDL::Image(640, 550, 0, 0, 0, 0, "resource/Hydra (4).png");
+InitScene::InitScene() :portBox(440, 400, 400, 50, "textModel.ttf"), ipaddrBox(440, 500, 400, 50, "textModel.ttf")
+{
+	upButton = SimpleSDL::Image(640, 550, 0, 0, 0, 255, "resource/ButtonFalse.png");
+	downButton = SimpleSDL::Image(640, 550, 0, 0, 0, 0, "resource/ButtonTrue.png");
+	BG = SimpleSDL::Image(0, 0, 0, 0, 0, 0, "resource/ReadyBG.jpg");
 }
 
 InitScene::~InitScene()
@@ -14,6 +15,7 @@ InitScene::~InitScene()
 
 void InitScene::render()
 {
+	BG.draw();
 	portBox.draw();
 	ipaddrBox.draw();
 	upButton.draw();
