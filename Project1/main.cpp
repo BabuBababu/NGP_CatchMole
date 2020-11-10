@@ -2,8 +2,8 @@
 
 int main(int argc, char* args[])
 {
-	SimpleSDL::init(600, 600);
-	TestScene* initScene = new TestScene();
+	SimpleSDL::init(1280, 768);
+	InitScene* initScene = new InitScene();
 	gFramework = new Framework(initScene);
 	//프레임워크는 초기 생성시 서버와 연결이 안되어있는 상태이다.
 	//initScene에서 사용자에게 서버의 주소와 포트번호를 입력받고

@@ -6,7 +6,7 @@ SDL_Window* SimpleSDL::gWindow = nullptr;
 //The window renderer
 SDL_Renderer* SimpleSDL::gRenderer = nullptr;
 
-std::vector<SimpleSDL::EditBox> SimpleSDL::EditBox::boxes;
+std::vector<SimpleSDL::EditBox*> SimpleSDL::EditBox::boxes;
 
 bool SimpleSDL::init(int windowWidth, int windowHeight)
 {
@@ -121,13 +121,80 @@ SimpleSDL::Image::Image(int x, int y, int z, int w, int h, int alpha, std::strin
 	textureWidth = w;
 	textureHeight = h;
 	this->alpha = alpha;
+	imageLocation = filePath;
+}
 
+SimpleSDL::Image::Image(const Image& other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	alpha = other.alpha;
+	textureWidth = other.textureWidth;
+	textureHeight = other.textureHeight;
+	imageLocation = other.imageLocation;
+
+	
+
+	//Load image at specified path
+	SDL_Surface* loadedSurface = IMG_Load(imageLocation.c_str());
+	if (loadedSurface == nullptr)
+	{
+		printf("Unable to load image %s! SDL_image Error: %s\n", imageLocation.c_str(), IMG_GetError());
+	}
+	else
+	{
+		//Create texture from surface pixels
+		texture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+		if (texture == nullptr)
+		{
+			printf("Unable to create texture from %s! SDL Error: %s\n", imageLocation.c_str(), SDL_GetError());
+		}
+
+		//Get rid of old loaded surface
+		SDL_FreeSurface(loadedSurface);
+	}
 }
 
 
 SimpleSDL::Image::~Image()
 {
 	SDL_DestroyTexture(texture);
+	texture = nullptr;
+}
+
+SimpleSDL::Image& SimpleSDL::Image::operator=(const Image& other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	alpha = other.alpha;
+	textureWidth = other.textureWidth;
+	textureHeight = other.textureHeight;
+	imageLocation = other.imageLocation;
+
+
+
+	//Load image at specified path
+	SDL_Surface* loadedSurface = IMG_Load(imageLocation.c_str());
+	if (loadedSurface == nullptr)
+	{
+		printf("Unable to load image %s! SDL_image Error: %s\n", imageLocation.c_str(), IMG_GetError());
+	}
+	else
+	{
+		//Create texture from surface pixels
+		texture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+		if (texture == nullptr)
+		{
+			printf("Unable to create texture from %s! SDL Error: %s\n", imageLocation.c_str(), SDL_GetError());
+		}
+
+		//Get rid of old loaded surface
+		SDL_FreeSurface(loadedSurface);
+	}
+
+	return *this;
 }
 
 void SimpleSDL::Image::free()
