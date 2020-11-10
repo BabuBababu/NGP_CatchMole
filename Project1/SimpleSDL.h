@@ -35,15 +35,6 @@ namespace SimpleSDL
 		{
 			SDL_SetTextureColorMod(texture, r, g, b);
 		}
-		void enableAlphaBlending()
-		{
-			SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(texture, alpha);
-		}
-		void disableAlphaBlending()
-		{
-			SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-		}
 		void setPosition(int x,int y)
 		{
 			this->x = x;
@@ -61,6 +52,7 @@ namespace SimpleSDL
 		void setAlphaValue(Uint8 alpha)
 		{
 			this->alpha = alpha;
+			SDL_SetTextureAlphaMod(texture, alpha);
 		}
 
 		std::pair<int, int> getPosition()
@@ -97,7 +89,7 @@ namespace SimpleSDL
 		TTF() = default;
 		TTF(int x, int y, int fontSize, Uint8 r, Uint8 g, Uint8 b, Uint8 a, std::string fontLocation, std::string text);
 		TTF(const TTF& other);
-		
+		TTF& operator=(const TTF& other);
 		~TTF();
 
 		void free();
@@ -215,84 +207,15 @@ namespace SimpleSDL
 	{
 	public:
 		EditBox() = default;
-		EditBox(int x,int y, int w,int h, std::string fontLoc):container(x, y + h / 8, h / 2, 0, 0, 0, 255, fontLoc.c_str(), "")
-		{
-			this->x = x;
-			this->y = y;
-			boxWidth = w;
-			boxHeight = h;
-			caretX = x;
-			content = "";
-			isFocused = false;
-			boxes.push_back(this);
-		}
-		EditBox(const EditBox& other)
-		{
-			x = other.x;
-			y = other.y;
-			boxWidth = other.boxWidth;
-			boxHeight = other.boxHeight;
-			caretX = other.caretX;
-			content = other.content;
-			isFocused = other.isFocused;
-			this->container = other.container;
-		}
+		EditBox(int x, int y, int w, int h, std::string fontLoc);
+		EditBox(const EditBox& other);
 		~EditBox() = default;
-		void handleEvent(SDL_Event&e)
-		{
-			if (e.type == SDL_MOUSEBUTTONDOWN)
-			{
-				int mx, my;
-				SDL_GetMouseState(&mx, &my);
-				if ((mx > x && mx < x + boxWidth) && (my > y && my < y + boxHeight))
-				{
-					for (auto& box : boxes)
-					{
-						box->setFocused(false);
-					}
-					isFocused = true;
-				}
-			}
-			else if (isFocused&&e.type==SDL_KEYDOWN&&e.key.keysym.sym == SDLK_BACKSPACE && content.length() > 0)
-			{
-				content.pop_back();
-				container.changeText(content);
-				caretX=container.getTextWidth()+x;
-				if (content.length() == 0)
-					caretX = x;
-			}
-			else if (isFocused&&e.type == SDL_TEXTINPUT)
-			{
-				content += e.text.text;
-				container.changeText(content);
-				caretX = container.getTextWidth() + x;
-			}
-		}
+		void handleEvent(SDL_Event& e);
 		void setFocused(bool value)
 		{
 			isFocused = value;
 		}
-		void draw()
-		{
-			SDL_Rect myRect;
-			myRect.x = x;
-			myRect.y = y;
-			myRect.w = boxWidth;
-			myRect.h = boxHeight;
-			SDL_SetRenderDrawColor(SimpleSDL::gRenderer, 0, 0, 0, 255);
-			SDL_RenderDrawRect(SimpleSDL::gRenderer, &myRect);
-			if (isFocused)
-			{
-				myRect.x = caretX;
-				myRect.y += myRect.h/4;
-				myRect.w = 5;
-				myRect.h /= 2;
-				SDL_RenderFillRect(SimpleSDL::gRenderer, &myRect);
-			}
-			SDL_SetRenderDrawColor(SimpleSDL::gRenderer, 255, 255, 255, 255);
-			
-			container.draw();
-		}
+		void draw();
 		std::string getContent()
 		{
 			return content;

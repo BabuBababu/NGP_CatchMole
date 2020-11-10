@@ -13,6 +13,7 @@ Communicator::Communicator()
 
 Communicator::~Communicator()
 {
+	closesocket(clntSock);
 	WSACleanup();
 }
 
