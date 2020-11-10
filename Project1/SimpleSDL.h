@@ -21,10 +21,12 @@ namespace SimpleSDL
 	class Image
 	{
 	public:
-		Image() = delete;
+		Image() = default;
 		Image(int x, int y, int z, int w, int h, int alpha, std::string filePath);
 		Image(const Image& other);
 		~Image();
+
+		Image& operator=(const Image& other);
 
 		void free();
 
@@ -85,6 +87,7 @@ namespace SimpleSDL
 		int textureWidth;
 		int textureHeight;
 		Uint8 alpha;
+		std::string imageLocation;
 	};
 	//ÀÌ¹ÌÁö
 
@@ -221,7 +224,7 @@ namespace SimpleSDL
 			caretX = x;
 			content = "";
 			isFocused = false;
-			boxes.push_back(*this);
+			boxes.push_back(this);
 		}
 		EditBox(const EditBox& other)
 		{
@@ -245,7 +248,7 @@ namespace SimpleSDL
 				{
 					for (auto& box : boxes)
 					{
-						box.setFocused(false);
+						box->setFocused(false);
 					}
 					isFocused = true;
 				}
@@ -294,7 +297,7 @@ namespace SimpleSDL
 		{
 			return content;
 		}
-		static std::vector<EditBox> boxes;
+		static std::vector<EditBox*> boxes;
 	private:
 		int x;
 		int y;

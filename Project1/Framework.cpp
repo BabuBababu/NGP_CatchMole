@@ -68,7 +68,7 @@ bool Framework::handleEvent()
 		}
 		for (auto& box : SimpleSDL::EditBox::boxes)
 		{
-			box.handleEvent(e);
+			box->handleEvent(e);
 		}
 		curScene->handleEvnet(e);
 	}
