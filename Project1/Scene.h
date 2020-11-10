@@ -32,6 +32,8 @@ private:
 	SimpleSDL::Image BG;
 	SimpleSDL::Image falseButton;
 	SimpleSDL::Image trueButton;
+
+	std::vector<SimpleSDL::TTF> ttf;
 };
 
 class MainScene : public Scene

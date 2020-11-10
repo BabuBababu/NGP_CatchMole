@@ -118,10 +118,19 @@ SimpleSDL::Image::Image(int x, int y, int z, int w, int h, int alpha, std::strin
 	this->x = x;
 	this->y = y;
 	this->z = z;
-	textureWidth = w;
-	textureHeight = h;
+	if (w == 0&&h==0)
+	{
+		SDL_QueryTexture(texture, NULL, NULL, &this->textureWidth, &this->textureHeight);
+	}
+	else
+	{
+		textureWidth = w;
+		textureHeight = h;
+	}
 	this->alpha = alpha;
 	imageLocation = filePath;
+	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(texture, alpha);
 }
 
 SimpleSDL::Image::Image(const Image& other)
@@ -154,6 +163,8 @@ SimpleSDL::Image::Image(const Image& other)
 		//Get rid of old loaded surface
 		SDL_FreeSurface(loadedSurface);
 	}
+	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(texture, alpha);
 }
 
 
@@ -193,7 +204,8 @@ SimpleSDL::Image& SimpleSDL::Image::operator=(const Image& other)
 		//Get rid of old loaded surface
 		SDL_FreeSurface(loadedSurface);
 	}
-
+	SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(texture, alpha);
 	return *this;
 }
 
@@ -246,6 +258,22 @@ SimpleSDL::TTF::TTF(const TTF& other)
 	font = TTF_OpenFont(filePath.c_str(), fontSize);
 	texture = nullptr;
 	loadText(text, r, g, b, a);
+}
+
+SimpleSDL::TTF& SimpleSDL::TTF::operator=(const TTF& other)
+{
+	x = other.x;
+	y = other.y;
+	fontSize = other.fontSize;
+	r = other.r;
+	g = other.g;
+	b = other.b;
+	filePath = other.filePath;
+	text = other.text;
+	font = TTF_OpenFont(filePath.c_str(), fontSize);
+	texture = nullptr;
+	loadText(text, r, g, b, a);
+	return *this;
 }
 
 SimpleSDL::TTF::~TTF()
@@ -306,4 +334,81 @@ bool SimpleSDL::TTF::loadText(std::string text, Uint8 r, Uint8 g, Uint8 b, Uint8
 	}
 
 	return texture != nullptr;
+}
+
+SimpleSDL::EditBox::EditBox(int x, int y, int w, int h, std::string fontLoc) :container(x, y + h / 8, h / 2, 0, 0, 0, 255, fontLoc.c_str(), "")
+{
+	this->x = x;
+	this->y = y;
+	boxWidth = w;
+	boxHeight = h;
+	caretX = x;
+	content = "";
+	isFocused = false;
+	boxes.push_back(this);
+}
+
+SimpleSDL::EditBox::EditBox(const EditBox& other)
+{
+	x = other.x;
+	y = other.y;
+	boxWidth = other.boxWidth;
+	boxHeight = other.boxHeight;
+	caretX = other.caretX;
+	content = other.content;
+	isFocused = other.isFocused;
+	this->container = other.container;
+}
+
+void SimpleSDL::EditBox::handleEvent(SDL_Event& e)
+{
+	if (e.type == SDL_MOUSEBUTTONDOWN)
+	{
+		int mx, my;
+		SDL_GetMouseState(&mx, &my);
+		if ((mx > x && mx < x + boxWidth) && (my > y && my < y + boxHeight))
+		{
+			for (auto& box : boxes)
+			{
+				box->setFocused(false);
+			}
+			isFocused = true;
+		}
+	}
+	else if (isFocused && e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_BACKSPACE && content.length() > 0)
+	{
+		content.pop_back();
+		container.changeText(content);
+		caretX = container.getTextWidth() + x;
+		if (content.length() == 0)
+			caretX = x;
+	}
+	else if (isFocused && e.type == SDL_TEXTINPUT)
+	{
+		content += e.text.text;
+		container.changeText(content);
+		caretX = container.getTextWidth() + x;
+	}
+}
+
+void SimpleSDL::EditBox::draw()
+{
+	SDL_Rect myRect;
+	myRect.x = x;
+	myRect.y = y;
+	myRect.w = boxWidth;
+	myRect.h = boxHeight;
+	SDL_SetRenderDrawColor(SimpleSDL::gRenderer, 0, 0, 0, 255);
+	SDL_RenderDrawRect(SimpleSDL::gRenderer, &myRect);
+	if (isFocused)
+	{
+		myRect.x = caretX;
+		myRect.y += myRect.h / 4;
+		myRect.w = 5;
+		myRect.h /= 2;
+		SDL_RenderFillRect(SimpleSDL::gRenderer, &myRect);
+	}
+	SDL_SetRenderDrawColor(SimpleSDL::gRenderer, 255, 255, 255, 255);
+
+	container.draw();
 }
