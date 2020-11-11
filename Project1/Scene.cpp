@@ -2,7 +2,7 @@
 
 
 
-InitScene::InitScene() :portBox(440, 400, 400, 50, "textModel.ttf"), ipaddrBox(440, 500, 400, 50, "textModel.ttf")
+InitScene::InitScene() :portBox(440, 500, 400, 50, "textModel.ttf"), ipaddrBox(440, 400, 400, 50, "textModel.ttf")
 {
 	falseButton = SimpleSDL::Image(540, 580, 0, 0, 0, 0, "resource/ButtonFalse.png");
 	trueButton = SimpleSDL::Image(540, 580, 0, 0, 0, 0, "resource/ButtonTrue.png");
