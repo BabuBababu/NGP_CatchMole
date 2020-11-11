@@ -11,6 +11,7 @@ public:
 	void render();
 	void communicateWithServ();
 	void updateScene();
+	bool recvInitialPacketFromServer();
 	bool connectingToServ(const std::string&servAddr,const std::string& portNum );
 	bool handleEvent();
 	bool update();
@@ -20,6 +21,7 @@ private:
 	Communicator* communicator;
 	ClientToServer* ctos;
 	GameSate* gs;
+	bool isGameStart;
 };
 
 extern Framework* gFramework;

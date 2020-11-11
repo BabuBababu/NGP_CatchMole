@@ -9,6 +9,7 @@ Framework::Framework(Scene* initScene)
 	ctos = new ClientToServer();
 	gs = new GameSate();
 	communicator = new Communicator();
+	isGameStart = false;
 }
 //프레임워크의 생성자에서 SDL 시스템을 사용하기 위한 초기화 작업과
 //게임이 최초 시작시 진입할 씬을 지정하고, 구조체를 위한 메모리를 할당받는다.
@@ -39,15 +40,21 @@ void Framework::render()
 
 void Framework::communicateWithServ()
 {
-	communicator->sendData(*ctos);
+	communicator->sendData(ctos);
 	//서버에게 클라이언트의 정보를 보내고
-	communicator->recvData(*gs);
+	communicator->recvData(gs);
 	//서버에게 게임의 현황을 받아온다.
 }
 
 void Framework::updateScene()
 {
 	curScene->update();
+}
+
+bool Framework::recvInitialPacketFromServer()
+{
+	isGameStart = communicator->recvInitialGameState(gs);
+	return isGameStart;
 }
 
 bool Framework::connectingToServ(const std::string& servAddr,const std::string& portNum)
@@ -83,6 +90,7 @@ bool Framework::update()
 {
 	if (handleEvent()) return true;
 	//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
+	if(isGameStart)
 	communicateWithServ();
 	//서버와 통신을 수행한다.
 	updateScene();

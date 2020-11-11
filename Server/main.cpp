@@ -3,5 +3,5 @@
 int main()
 {
 	TotalManager manager;
-	while (!TotalManager::gameLogicThread());
+	while (TotalManager::gameLogicThread());
 }

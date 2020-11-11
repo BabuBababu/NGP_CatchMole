@@ -1,11 +1,19 @@
 #include "TotalManager.h"
-#include <iostream>
 
 int TotalManager::portNumber = 8000;
+const int acceptableNum = 1;
+void err_display(const char* msg)
+{
+	LPVOID lpMsgBuf;
+	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, WSAGetLastError(),
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+	std::cout << msg << "\t" << (char*)lpMsgBuf;
+	LocalFree(lpMsgBuf);
+}
 
 TotalManager::TotalManager()
 {
-	threads.resize(2);
+	threads.reserve(2);
 	isLogicThreadCompleted = false;
 	recvPacketFromClnt[0] = false;
 	recvPacketFromClnt[1] = false;
@@ -29,8 +37,8 @@ TotalManager::TotalManager()
 	ZeroMemory(&servAddr, sizeof(SOCKADDR_IN));
 	servAddr.sin_family = AF_INET;
 	servAddr.sin_port = htons(portNumber);
-	servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
+	servAddr.sin_addr.s_addr = htonl(ADDR_ANY);
+	
 	if (bind(listenSock, (SOCKADDR*)(&servAddr), sizeof(SOCKADDR_IN)) == SOCKET_ERROR)
 		std::cout << "listen socket bind failed" << std::endl;
 	
@@ -40,24 +48,38 @@ TotalManager::TotalManager()
 	int connectedClientNum = 0;
 	while (true)
 	{
-		if (connectedClientNum > 1)
+		if (connectedClientNum > acceptableNum-1)
 			break;
 		SOCKADDR_IN clntAddr;
-		int clntAddrSize;
+		int clntAddrSize=sizeof(SOCKADDR_IN);
 		ZeroMemory(&clntAddr, sizeof(clntAddr));
 		clntSock[connectedClientNum] = accept(listenSock, (SOCKADDR*)&clntAddr, &clntAddrSize);
+
 		if (clntSock[connectedClientNum] == INVALID_SOCKET)
-			std::cout << "client connection failed" << std::endl;
-		threads.emplace_back(TotalManager::clntProcessingThread, connectedClientNum);
-		threads[connectedClientNum].join();
+			std::cout << "Connection error" << std::endl;
+		
 		++connectedClientNum;
 	}
 	//여기까지 오면 클라이언트 2개로 부터 연결을 다 받은 것이다.
-	//send(clntSock[0], (char*)gs, sizeof(GameState), 0);
-	//send(clntSock[1], (char*)gs, sizeof(GameState), 0);
+
+	for (int i = 0; i < acceptableNum; ++i)
+	{
+		threads.emplace_back(TotalManager::clntProcessingThread, i);
+		threads[i].join();
+	}
+
+	gs->p1Point = 100;
+	gs->p2Point = 100;
+	gs->remainingTime = 30;
+
+	for (int i = 0; i < acceptableNum; ++i)
+	{
+		send(clntSock[i], (char*)gs, sizeof(GameState), 0);
+	}
 	//연결을 받았으면 두 클라이언트에게 초기 GameState 정보를 보내준다.
 
 	//게임로직쓰레드는 자연스럽게 메인쓰레드에서 실행된다.
+	
 }
 
 TotalManager::~TotalManager()
@@ -72,10 +94,14 @@ TotalManager::~TotalManager()
 
 bool TotalManager::gameLogicThread()
 {
-	
+	return true;
 }
 
 void TotalManager::clntProcessingThread(int threadID)
 {
-
+	std::cout << "ThreadID is:" << threadID << std::endl;
+	/*SOCKADDR_IN addr;
+	int len;
+	getpeername(clntSock[0], (SOCKADDR*)&addr, &len);
+	std::cout << "client from: " << inet_ntoa(addr.sin_addr) << "port num: " << ntohs(addr.sin_port) << std::endl;*/
 }
