@@ -6,14 +6,17 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <iostream>
 
+#pragma pack(1)
 struct ClientToServer
 {
 	int clikedHole;
 	std::chrono::steady_clock::time_point clikedTime;
 }typedef ClientToServer;
+#pragma pack()
 
-
+#pragma pack(1)
 struct GameState
 {
 	int remainingTime;
@@ -23,22 +26,26 @@ struct GameState
 	int p2HammerFrame;
 	std::pair<int, float> molespos[9];
 }typedef GameState;
+#pragma pack()
 
 class TotalManager
 {
 public:
 	TotalManager();
 	~TotalManager();
-	static bool gameLogicThread();
+
+	static void gameLogicThread();
 	static void clntProcessingThread(int threadID);
 	//이 함수들은 나중에 구현할 예정임.
+	static std::vector<std::thread> threads;
+	static std::atomic<bool> isGameOver;
 private:
-	SOCKET listenSock;
-	SOCKET clntSock[2];
-	std::vector<std::thread> threads;
-	std::atomic<bool> isLogicThreadCompleted;
-	std::atomic<bool> recvPacketFromClnt[2];
-	GameState* gs;
-	ClientToServer* ctos;
+	static SOCKET listenSock;
+	static SOCKET clntSock[2];
+	static std::atomic<bool> isLogicThreadCompleted;
+	static std::atomic<bool> recvPacketFromClnt[2];
+	static GameState* gs;
+	static ClientToServer* ctos;
 	static int portNumber;
+
 };

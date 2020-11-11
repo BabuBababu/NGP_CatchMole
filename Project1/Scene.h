@@ -47,4 +47,7 @@ public:
 	void handleEvnet(SDL_Event& e) override;
 private:
 	SimpleSDL::Image test;
+
+
+	bool isRecvInitialPacket;
 };

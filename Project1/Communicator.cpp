@@ -17,14 +17,16 @@ Communicator::~Communicator()
 	WSACleanup();
 }
 
-void Communicator::sendData(ClientToServer& obj)
+void Communicator::sendData(ClientToServer* obj)
 {
-	send(clntSock, (char*)&obj, sizeof(ClientToServer), 0);
+	send(clntSock, (char*)obj, sizeof(ClientToServer), 0);
 }
 
-void Communicator::recvData(GameState& obj)
+bool Communicator::recvData(GameState* obj)
 {
-	recv(clntSock, (char*)&obj, sizeof(obj), 0);
+	if (recv(clntSock, (char*)obj, sizeof(GameState), 0) == 0)
+		return false;
+	return true;
 }
 
 bool Communicator::connectToServ(const std::string& servAddr, const std::string& portNum)
@@ -42,4 +44,11 @@ bool Communicator::connectToServ(const std::string& servAddr, const std::string&
 		return false;
 	}
 	return true;
+}
+
+bool Communicator::recvInitialGameState(GameState* gs)
+{
+	if (recv(clntSock, (char*)gs, sizeof(GameState), 0) > 0) 
+		return true;
+	return false;
 }
