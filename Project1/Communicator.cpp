@@ -32,6 +32,8 @@ bool Communicator::recvData(GameState* obj)
 bool Communicator::connectToServ(const std::string& servAddr, const std::string& portNum)
 {
 	clntSock = socket(PF_INET, SOCK_STREAM, 0);
+	//struct timeval tv_timeo = { 1,000000 };
+	//setsockopt(clntSock, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_timeo, sizeof(tv_timeo));
 	SOCKADDR_IN addr;
 	ZeroMemory(&addr, sizeof(addr));
 	addr.sin_family = PF_INET;
