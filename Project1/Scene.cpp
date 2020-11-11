@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "Communicator.h"
+#include "Framework.h"
 
 //이미지 초기 알파값 설정 잘 할것. 0으로 하면 안 보임.
 
@@ -62,7 +63,8 @@ void InitScene::handleEvnet(SDL_Event& e)
 			//먼저 서버에 portNum과 ipaddr 값을 보내주고 mainscene으로 넘어가기 구현 
 			Communicator player;
 			player.connectToServ(ipaddr, portNum);
-
+			MainScene * mainscene = new MainScene();
+			gFramework->changeScene(mainscene);
 		}
 	}
 	else if (e.type == SDL_MOUSEBUTTONUP)
@@ -87,6 +89,7 @@ void MainScene::render()
 
 void MainScene::update()
 {
+	//다른 플레이어도 접속을 성공했다면 화면 밝아지고 게임 시작
 }
 
 void MainScene::handleEvnet(SDL_Event& e)
