@@ -51,7 +51,7 @@ void InitScene::update()
 void InitScene::handleEvnet(SDL_Event& e)
 {
 	//이부분부터 절대 지우지마셈!!! 
-
+	
 	if (e.type == SDL_MOUSEBUTTONDOWN)
 	{
 		int x, y;
@@ -63,7 +63,6 @@ void InitScene::handleEvnet(SDL_Event& e)
 			//먼저 서버에 portNum과 ipaddr 값을 보내주고 mainscene으로 넘어가기 구현 
 			Communicator player;
 			player.connectToServ(ipaddr, portNum);
-			
 			MainScene * mainscene = new MainScene();
 			gFramework->changeScene(mainscene);
 		}
@@ -85,7 +84,6 @@ MainScene::~MainScene()
 
 void MainScene::render()
 {
-	test.draw();
 	test.draw();
 }
 
