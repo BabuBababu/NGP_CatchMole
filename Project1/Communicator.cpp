@@ -22,9 +22,11 @@ void Communicator::sendData(ClientToServer* obj)
 	send(clntSock, (char*)obj, sizeof(ClientToServer), 0);
 }
 
-void Communicator::recvData(GameState* obj)
+bool Communicator::recvData(GameState* obj)
 {
-	recv(clntSock, (char*)obj, sizeof(GameState), 0);
+	if (recv(clntSock, (char*)obj, sizeof(GameState), 0) == 0)
+		return false;
+	return true;
 }
 
 bool Communicator::connectToServ(const std::string& servAddr, const std::string& portNum)

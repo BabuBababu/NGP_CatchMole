@@ -38,7 +38,7 @@ public:
 	static void clntProcessingThread(int threadID);
 	//이 함수들은 나중에 구현할 예정임.
 	static std::vector<std::thread> threads;
-	static bool isGameOver;
+	static std::atomic<bool> isGameOver;
 private:
 	static SOCKET listenSock;
 	static SOCKET clntSock[2];

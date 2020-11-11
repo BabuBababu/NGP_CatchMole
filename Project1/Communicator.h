@@ -31,7 +31,7 @@ public:
 	Communicator();
 	~Communicator();
 	void sendData(ClientToServer* obj);
-	void recvData(GameState* obj);
+	bool recvData(GameState* obj);
 	bool connectToServ(const std::string& servAddr, const std::string& portNum);
 	bool recvInitialGameState(GameState* gs);
 private:

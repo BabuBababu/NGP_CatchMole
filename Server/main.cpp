@@ -4,8 +4,6 @@ int main()
 {
 	TotalManager manager;
 	for (auto& thread : TotalManager::threads)
-	{
 		thread.join();
-	}
-	while (TotalManager::isGameOver);
+	return 0;
 }

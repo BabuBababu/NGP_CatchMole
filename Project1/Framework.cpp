@@ -38,12 +38,14 @@ void Framework::render()
 	SDL_RenderPresent(SimpleSDL::gRenderer);
 }
 
-void Framework::communicateWithServ()
+bool Framework::communicateWithServ()
 {
 	communicator->sendData(ctos);
 	//서버에게 클라이언트의 정보를 보내고
-	communicator->recvData(gs);
+	if (!communicator->recvData(gs))
+		return false;
 	//서버에게 게임의 현황을 받아온다.
+	return true;
 }
 
 void Framework::updateScene()
@@ -90,8 +92,8 @@ bool Framework::update()
 {
 	if (handleEvent()) return true;
 	//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
-	if(isGameStart)
-		communicateWithServ();
+	if (isGameStart)
+		if (!communicateWithServ()) return true;
 	//서버와 통신을 수행한다.
 	//아직 서버단에서 클라이언트 처리 코드를 넣지 않았기때문에
 	//잠시 주석처리한다.

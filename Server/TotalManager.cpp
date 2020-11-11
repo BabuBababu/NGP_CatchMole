@@ -1,7 +1,7 @@
 #include "TotalManager.h"
 
 int TotalManager::portNumber = 8000;
-const int acceptableNum = 1;
+const int acceptableNum = 2;
 
 SOCKET TotalManager::listenSock;
 SOCKET TotalManager::clntSock[2];
@@ -9,7 +9,7 @@ std::atomic<bool> TotalManager::isLogicThreadCompleted;
 std::atomic<bool> TotalManager::recvPacketFromClnt[2];
 GameState* TotalManager::gs;
 ClientToServer* TotalManager::ctos;
-bool TotalManager::isGameOver = false;
+std::atomic<bool> TotalManager::isGameOver = false;
 std::vector<std::thread> TotalManager::threads;
 
 void err_display(const char* msg)
@@ -95,11 +95,12 @@ void TotalManager::gameLogicThread()
 {
 	while (1)
 	{
-		while (!recvPacketFromClnt[0] /*&& !recvPacketFromClnt[1]*/);
+		while (!recvPacketFromClnt[0] && !recvPacketFromClnt[1]);
 		std::cout << "finishing" << std::endl;
-		Sleep(1000);
+		Sleep(100);
 		//게임로직처리대신 우선 슬립을 넣었음 슬립 부분을 게임로직으로 대체할것임.
 		isLogicThreadCompleted = true;
+		if (isGameOver)return;
 	}
 }
 
@@ -108,6 +109,7 @@ void TotalManager::clntProcessingThread(int threadID)
 	std::cout << "ThreadID is:" << threadID << std::endl;
 	while (1)
 	{
+		if (isGameOver)return;
 		if (recv(clntSock[threadID], (char*)ctos, sizeof(ClientToServer), 0) == 0)
 			isGameOver = true;
 		std::cout << "recv from clnt" << std::endl;
@@ -117,11 +119,13 @@ void TotalManager::clntProcessingThread(int threadID)
 		while (!isLogicThreadCompleted);
 		//로직쓰레드가 완료됐다는 플래그가 될때까지 대기한다.
 		recvPacketFromClnt[threadID] = false;
-		if (!recvPacketFromClnt[0]/* && !recvPacketFromClnt[1]*/)
+		if (!recvPacketFromClnt[0] && !recvPacketFromClnt[1])
 			isLogicThreadCompleted = false;
-		send(clntSock[threadID], (char*)gs, sizeof(GameState), 0);
+		if(!isGameOver)
+			send(clntSock[threadID], (char*)gs, sizeof(GameState), 0);
 		std::cout << "send to clnt" << std::endl;
 		//로직 쓰레드가 완료되었다면 대기상태에서 풀려나 클라이언트를 위한 서비스를 재개한다.
+		if (isGameOver)return;
+		//클라이언트 한 명만 종료되도 종료가된다.
 	}
 }
-//쓰레드는 부모쓰레드(main)이 종료되면 자동으로 종료되기때문에 종료를 위해 따로 처리해주지않는다.
