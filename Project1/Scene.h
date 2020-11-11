@@ -46,5 +46,5 @@ public:
 	void update() override;
 	void handleEvnet(SDL_Event& e) override;
 private:
-
+	SimpleSDL::Image test;
 };
