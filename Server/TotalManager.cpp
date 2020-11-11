@@ -68,8 +68,7 @@ TotalManager::TotalManager()
 		if (clntSock[connectedClientNum] == INVALID_SOCKET)
 			std::cout << "Connection error" << std::endl;
 
-		send(clntSock[connectedClientNum], (char*)gs, sizeof(GameState), 0);
-		//연결이 되자마자 패킷을 보내준다.
+		
 		++connectedClientNum;
 	}
 	//여기까지 오면 클라이언트 2개로 부터 연결을 다 받은 것이다.
@@ -78,7 +77,10 @@ TotalManager::TotalManager()
 		threads.emplace_back(TotalManager::clntProcessingThread, i);
 	
 	
-	threads.emplace_back(TotalManager::gameLogicThread);;
+	threads.emplace_back(TotalManager::gameLogicThread);
+
+	for(int i=0;i<acceptableNum;++i)
+		send(clntSock[i], (char*)gs, sizeof(GameState), 0);
 }
 
 TotalManager::~TotalManager()
