@@ -1,12 +1,12 @@
 #include "Scene.h"
 
-
+//이미지 초기 알파값 설정 잘 할것. 0으로 하면 안 보임.
 
 InitScene::InitScene() :portBox(440, 500, 400, 50, "textModel.ttf"), ipaddrBox(440, 400, 400, 50, "textModel.ttf")
 {
-	falseButton = SimpleSDL::Image(540, 580, 0, 0, 0, 0, "resource/ButtonFalse.png");
-	trueButton = SimpleSDL::Image(540, 580, 0, 0, 0, 0, "resource/ButtonTrue.png");
-	BG = SimpleSDL::Image(0, 0, 0, 0, 0, 0, "resource/ReadyBG.jpg");
+	falseButton = SimpleSDL::Image(540, 580, 0, 0, 0, 255, "resource/ButtonFalse.png");
+	trueButton = SimpleSDL::Image(540, 580, 0, 0, 0, 255, "resource/ButtonTrue.png");
+	BG = SimpleSDL::Image(0, 0, 0, 0, 0, 255, "resource/ReadyBG.jpg");
 }
 
 InitScene::~InitScene()
@@ -29,7 +29,7 @@ void InitScene::render()
 		trueButton.draw();
 	}
 
-	std::cout << portNum <<"," << ipaddr << std::endl;
+	//std::cout << portNum <<"," << ipaddr << std::endl;
 
 
 
@@ -54,11 +54,12 @@ void InitScene::handleEvnet(SDL_Event& e)
 	{
 		int x, y;
 		SDL_GetMouseState(&x, &y);
-		if ((540 < x < 640) && (580 < y < 630))
+		auto buttonPos = trueButton.getPosition();
+		auto buttonSize = trueButton.getTextureSize();
+		if ((buttonPos.first < x && x < buttonPos.first+buttonSize.first) && (buttonPos.second < y && y < buttonPos.second+buttonSize.second))
 		{
 			//먼저 서버에 portNum과 ipaddr 값을 보내주고 mainscene으로 넘어가기 구현 
-			
-			
+
 		}
 	}
 	else if (e.type == SDL_MOUSEBUTTONUP)
