@@ -3,5 +3,9 @@
 int main()
 {
 	TotalManager manager;
-	while (TotalManager::gameLogicThread());
+	for (auto& thread : TotalManager::threads)
+	{
+		thread.join();
+	}
+	while (TotalManager::isGameOver);
 }

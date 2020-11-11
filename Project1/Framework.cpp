@@ -91,8 +91,11 @@ bool Framework::update()
 	if (handleEvent()) return true;
 	//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
 	if(isGameStart)
-	communicateWithServ();
+		communicateWithServ();
 	//서버와 통신을 수행한다.
+	//아직 서버단에서 클라이언트 처리 코드를 넣지 않았기때문에
+	//잠시 주석처리한다.
+
 	updateScene();
 	//서버에게 받은 게임스테이트를 통해 씬을 업데이트한다.
 	render();

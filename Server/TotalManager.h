@@ -34,16 +34,18 @@ public:
 	TotalManager();
 	~TotalManager();
 
-	static bool gameLogicThread();
+	static void gameLogicThread();
 	static void clntProcessingThread(int threadID);
 	//이 함수들은 나중에 구현할 예정임.
+	static std::vector<std::thread> threads;
+	static bool isGameOver;
 private:
-	SOCKET listenSock;
-	SOCKET clntSock[2];
-	std::vector<std::thread> threads;
-	std::atomic<bool> isLogicThreadCompleted;
-	std::atomic<bool> recvPacketFromClnt[2];
-	GameState* gs;
-	ClientToServer* ctos;
+	static SOCKET listenSock;
+	static SOCKET clntSock[2];
+	static std::atomic<bool> isLogicThreadCompleted;
+	static std::atomic<bool> recvPacketFromClnt[2];
+	static GameState* gs;
+	static ClientToServer* ctos;
 	static int portNumber;
+
 };

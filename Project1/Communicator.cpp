@@ -46,7 +46,6 @@ bool Communicator::connectToServ(const std::string& servAddr, const std::string&
 
 bool Communicator::recvInitialGameState(GameState* gs)
 {
-	int test = 0;
 	if (recv(clntSock, (char*)gs, sizeof(GameState), 0) > 0) 
 		return true;
 	return false;
