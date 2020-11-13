@@ -46,8 +46,13 @@ public:
 	void update() override;
 	void handleEvnet(SDL_Event& e) override;
 private:
-	SimpleSDL::Image test;
-
+	SimpleSDL::Image BG;
+	SimpleSDL::Image RedHammer;
+	//하위 목록은 벡터로
+	SimpleSDL::Image RedHammerAnimation;
+	SimpleSDL::Image Drone;
+	SimpleSDL::Image Hydra;
+	SimpleSDL::Image Zergling;
 
 	bool isRecvInitialPacket;
 };
