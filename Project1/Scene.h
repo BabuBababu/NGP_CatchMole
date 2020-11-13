@@ -49,10 +49,9 @@ private:
 	SimpleSDL::Image BG;
 	SimpleSDL::Image RedHammer;
 	//하위 목록은 벡터로
-	SimpleSDL::Image RedHammerAnimation;
-	SimpleSDL::Image Drone;
-	SimpleSDL::Image Hydra;
-	SimpleSDL::Image Zergling;
+
+	std::vector<SimpleSDL::Image> Hole[9];
+	std::vector<SimpleSDL::Image> RedHammerAnimation;
 
 	bool isRecvInitialPacket;
 };

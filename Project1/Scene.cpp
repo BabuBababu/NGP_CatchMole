@@ -1,7 +1,6 @@
 #include "Scene.h"
 #include "Communicator.h"
 #include "Framework.h"
-
 //이미지 초기 알파값 설정 잘 할것. 0으로 하면 안 보임.
 
 InitScene::InitScene() :portBox(440, 400, 400, 50, "textModel.ttf"), ipaddrBox(440, 500, 400, 50, "textModel.ttf")
@@ -35,11 +34,6 @@ void InitScene::render()
 
 
 
-	//Zergling.draw();
-	//for (auto& img : Hydra)
-	//{
-	//	img.draw();
-	//}
 }
 
 void InitScene::update()
@@ -75,7 +69,27 @@ void InitScene::handleEvnet(SDL_Event& e)
 
 MainScene::MainScene(): BG(0,0,0,0,0,255,"resource/BackGround.jpg"), RedHammer(0,0,0,0,0,255,"resource/RedHammer.png"),isRecvInitialPacket(false)
 {
-
+	//하드코딩 양해좀
+	std::string Zerg[3] = {"Drone", "Zergling", "Hydra"};
+		
+	for (int i = 0; i < 3; ++i) {   // 첫번째 줄
+		std::string Selected = Zerg[rand() % 3];
+		for (int j = 1; j < 6; ++j) {
+			Hole[i].emplace_back(200+i*300, 100, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
+		}
+	}
+	for (int i = 0; i < 3; ++i) {  // 두번째 줄
+		std::string Selected = Zerg[rand() % 3];
+		for (int j = 1; j < 6; ++j) {
+			Hole[i+3].emplace_back(200+i*300, 300, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
+		}
+	}
+	for (int i = 0; i < 3; ++i) {  // 세번째 줄
+		std::string Selected = Zerg[rand() % 3];
+		for (int j = 1; j < 6; ++j) {
+			Hole[i+6].emplace_back(200+i*300, 500, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
+		}
+	}
 }
 
 MainScene::~MainScene()
@@ -86,6 +100,15 @@ void MainScene::render()
 {
 	BG.draw();
 	RedHammer.draw();
+
+	//두더지 9마리 동시에 그린다.
+	for (int i = 0; i < 9; ++i) {
+		for (auto& img : Hole[i])
+		{
+			img.draw();
+		}
+	}
+	
 }
 
 void MainScene::update()
