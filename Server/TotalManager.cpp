@@ -1,7 +1,7 @@
 #include "TotalManager.h"
 
 int TotalManager::portNumber = 8000;
-const int acceptableNum = 2;
+const int acceptableNum = 1;
 
 SOCKET TotalManager::listenSock;
 SOCKET TotalManager::clntSock[2];
@@ -11,6 +11,7 @@ GameState* TotalManager::gs;
 ClientToServer* TotalManager::ctos;
 std::atomic<bool> TotalManager::isGameOver = false;
 std::vector<std::thread> TotalManager::threads;
+
 
 void err_display(const char* msg)
 {
@@ -102,7 +103,11 @@ void TotalManager::gameLogicThread()
 		Sleep(100);
 		//게임로직처리대신 우선 슬립을 넣었음 슬립 부분을 게임로직으로 대체할것임.
 		isLogicThreadCompleted = true;
-		if (isGameOver)return;
+		if (isGameOver) 
+		{
+			std::cout << "gameLogicThreadOver" << std::endl;
+			return; 
+		}
 	}
 }
 
@@ -111,8 +116,10 @@ void TotalManager::clntProcessingThread(int threadID)
 	std::cout << "ThreadID is:" << threadID << std::endl;
 	while (1)
 	{
+		auto start = std::chrono::high_resolution_clock::now();
 		if (isGameOver)return;
-		if (recv(clntSock[threadID], (char*)ctos, sizeof(ClientToServer), 0) == 0)
+		int temp = 0;
+		if (recv(clntSock[threadID], (char*)ctos, sizeof(ClientToServer), 0) <= 0)
 			isGameOver = true;
 		std::cout << "recv from clnt" << std::endl;
 		//서버에게 데이터를 받고
@@ -129,5 +136,11 @@ void TotalManager::clntProcessingThread(int threadID)
 		//로직 쓰레드가 완료되었다면 대기상태에서 풀려나 클라이언트를 위한 서비스를 재개한다.
 		if (isGameOver)return;
 		//클라이언트 한 명만 종료되도 종료가된다.
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<float> fsec;
+		fsec = end - start;
+		/*TotalManager::deadTime[threadID] += fsec.count();
+		if (deadTime[threadID] > 1.5f)
+			isGameOver = true;*/
 	}
 }
