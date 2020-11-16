@@ -39,6 +39,7 @@ public:
 	//이 함수들은 나중에 구현할 예정임.
 	static std::vector<std::thread> threads;
 	static std::atomic<bool> isGameOver;
+	//두 쓰레드에서 각기 사용할 deadTime.
 private:
 	static SOCKET listenSock;
 	static SOCKET clntSock[2];

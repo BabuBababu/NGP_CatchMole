@@ -113,10 +113,10 @@ void MainScene::render()
 
 void MainScene::update()
 {
-	//if (!isRecvInitialPacket)
-	//{
-	//	isRecvInitialPacket=gFramework->recvInitialPacketFromServer();
-	//}
+	if (!isRecvInitialPacket)
+	{
+		isRecvInitialPacket = gFramework->recvInitialPacketFromServer();
+	}
 	//다른 플레이어도 접속을 성공했다면 화면 밝아지고 게임 시작
 
 	int x, y;

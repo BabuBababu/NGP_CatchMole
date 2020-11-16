@@ -24,7 +24,7 @@ void Communicator::sendData(ClientToServer* obj)
 
 bool Communicator::recvData(GameState* obj)
 {
-	if (recv(clntSock, (char*)obj, sizeof(GameState), 0) == 0)
+	if (recv(clntSock, (char*)obj, sizeof(GameState), 0) <= 0)
 		return false;
 	return true;
 }
@@ -32,8 +32,9 @@ bool Communicator::recvData(GameState* obj)
 bool Communicator::connectToServ(const std::string& servAddr, const std::string& portNum)
 {
 	clntSock = socket(PF_INET, SOCK_STREAM, 0);
-	//struct timeval tv_timeo = { 1,000000 };
-	//setsockopt(clntSock, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv_timeo, sizeof(tv_timeo));
+	int outTime = 1000;
+	setsockopt(clntSock, SOL_SOCKET, SO_RCVTIMEO, (char*)&outTime, sizeof(outTime));
+	//1초간 수신받지 못 하면 종료한다.
 	SOCKADDR_IN addr;
 	ZeroMemory(&addr, sizeof(addr));
 	addr.sin_family = PF_INET;
