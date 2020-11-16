@@ -1,7 +1,7 @@
 #include "TotalManager.h"
 
 int TotalManager::portNumber = 8000;
-const int acceptableNum = 1;
+const int acceptableNum = 2;
 
 SOCKET TotalManager::listenSock;
 SOCKET TotalManager::clntSock[2];

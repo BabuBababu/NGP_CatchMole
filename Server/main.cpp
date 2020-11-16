@@ -11,7 +11,7 @@ int main()
 		thread.join();
 	}*/
 
-	DWORD cNumRead, fdwMode, i;
+	DWORD cNumRead, fdwMode;
 	INPUT_RECORD irInBuf[4];
 
 	hStdin = GetStdHandle(STD_INPUT_HANDLE);
