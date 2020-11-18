@@ -98,9 +98,12 @@ void TotalManager::gameLogicThread()
 {
 	while (1)
 	{
-		while (!recvPacketFromClnt[0] && !recvPacketFromClnt[1]);
+		while (1)
+		{
+			if (recvPacketFromClnt[0] && recvPacketFromClnt[1]) break;
+		}
 		std::cout << "finishing" << std::endl;
-		Sleep(100);
+		Sleep(50);
 		//게임로직처리대신 우선 슬립을 넣었음 슬립 부분을 게임로직으로 대체할것임.
 		isLogicThreadCompleted = true;
 		if (isGameOver) 
@@ -116,19 +119,21 @@ void TotalManager::clntProcessingThread(int threadID)
 	std::cout << "ThreadID is:" << threadID << std::endl;
 	while (1)
 	{
-		auto start = std::chrono::high_resolution_clock::now();
 		if (isGameOver)return;
 		int temp = 0;
 		if (recv(clntSock[threadID], (char*)ctos, sizeof(ClientToServer), 0) <= 0)
 			isGameOver = true;
 		std::cout << "recv from clnt" << std::endl;
-		//서버에게 데이터를 받고
+		//클라이언트에게 데이터를 받고
 		recvPacketFromClnt[threadID] = true;
 		//내가 패킷을 받았다는 플래그를 true로 만든다.
 		while (!isLogicThreadCompleted);
 		//로직쓰레드가 완료됐다는 플래그가 될때까지 대기한다.
 		recvPacketFromClnt[threadID] = false;
-		if (!recvPacketFromClnt[0] && !recvPacketFromClnt[1])
+		while (true)
+		{
+			if (!recvPacketFromClnt[0] && !recvPacketFromClnt[1]) break;
+		}
 			isLogicThreadCompleted = false;
 		if(!isGameOver)
 			send(clntSock[threadID], (char*)gs, sizeof(GameState), 0);
@@ -136,11 +141,5 @@ void TotalManager::clntProcessingThread(int threadID)
 		//로직 쓰레드가 완료되었다면 대기상태에서 풀려나 클라이언트를 위한 서비스를 재개한다.
 		if (isGameOver)return;
 		//클라이언트 한 명만 종료되도 종료가된다.
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<float> fsec;
-		fsec = end - start;
-		/*TotalManager::deadTime[threadID] += fsec.count();
-		if (deadTime[threadID] > 1.5f)
-			isGameOver = true;*/
 	}
 }
