@@ -60,36 +60,41 @@ void InitScene::handleEvnet(SDL_Event& e)
 			gFramework->changeScene(mainscene);
 		}
 	}
-	else if (e.type == SDL_MOUSEBUTTONUP)
-	{
-	}
 }
 
 
 
 MainScene::MainScene(): BG(0,0,0,0,0,255,"resource/BackGround.jpg"), RedHammer(0,0,0,0,0,255,"resource/RedHammer.png"),isRecvInitialPacket(false)
 {
+	//int x, int y, int z, int w, int h, int alpha, std::string filePath
 	//하드코딩 양해좀
 	std::string Zerg[3] = {"Drone", "Zergling", "Hydra"};
-		
-	for (int i = 0; i < 3; ++i) {   // 첫번째 줄
-		std::string Selected = Zerg[rand() % 3];
-		for (int j = 1; j < 6; ++j) {
-			Hole[i].emplace_back(200+i*300, 100, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
+	Holes.reserve(9);
+	Drones[0].reserve(2);
+	Hydras[0].reserve(2);
+	Zergs[0].reserve(2);
+	Drones[1].reserve(2);
+	Hydras[1].reserve(2);
+	Zergs[1].reserve(2);
+	//드론과 히드라 저그 몬스터 3프레임있는걸 2개 쓴다.
+	int y = -250;
+
+	for (int i = 0; i < HoleNumber; ++i)
+	{
+		if (i % HolePerLine == 0) y += 250;
+		Holes.emplace_back(60 + i%HolePerLine * 500, y, 0, 0, 0, 255, "resource/hole.png");
+	}
+
+	for (int i = 0; i < 2; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			Drones[i].emplace_back(0, 0, 0, 0, 0, 0, "resource/Drone" + std::to_string(j + 1) + ".png");
+			Hydras[i].emplace_back(0, 0, 0, 0, 0, 0, "resource/Hydra" + std::to_string(j + 1) + ".png");
+			Zergs[i].emplace_back(0, 0, 0, 0, 0, 0, "resource/Zergling" + std::to_string(j + 1) + ".png");
 		}
 	}
-	for (int i = 0; i < 3; ++i) {  // 두번째 줄
-		std::string Selected = Zerg[rand() % 3];
-		for (int j = 1; j < 6; ++j) {
-			Hole[i+3].emplace_back(200+i*300, 300, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
-		}
-	}
-	for (int i = 0; i < 3; ++i) {  // 세번째 줄
-		std::string Selected = Zerg[rand() % 3];
-		for (int j = 1; j < 6; ++j) {
-			Hole[i+6].emplace_back(200+i*300, 500, 0, 0, 0, 255, "resource/" + Selected + " (" + std::to_string(j) + ").png");
-		}
-	}
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 MainScene::~MainScene()
@@ -101,29 +106,92 @@ void MainScene::render()
 	BG.draw();
 	RedHammer.draw();
 
-	//두더지 9마리 동시에 그린다.
-	for (int i = 0; i < 9; ++i) {
-		for (auto& img : Hole[i])
+	for (int i = 0; i < Holes.size(); ++i)
+		Holes[i].draw();
+
+	for (int i = 0; i < 2; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
 		{
-			img.draw();
+			Drones[i][j].draw();
+			Hydras[i][j].draw();
+			Zergs[i][j].draw();
 		}
 	}
-	
+	//두더지 이미지들을 쭉순회하면서 그린다.
+	for (int i = 0; i < 2; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			Drones[i][j].setAlphaValue(0);
+			Hydras[i][j].setAlphaValue(0);
+			Zergs[i][j].setAlphaValue(0);
+		}
+	}
+	//이미지를 백 버퍼에 다 그렸으면 그린 이미지는 알파값을 0으로
+	//설정해 보이지 않도록 한다.
 }
 
 void MainScene::update()
 {
-	if (!isRecvInitialPacket)
-	{
-		isRecvInitialPacket = gFramework->recvInitialPacketFromServer();
-	}
-	//다른 플레이어도 접속을 성공했다면 화면 밝아지고 게임 시작
-
 	int x, y;
 	SDL_GetMouseState(&x, &y);
 	RedHammer.setPosition(x-100, y-75);
+	//망치를 그리고
+	GameState* curGameState = gFramework->getGameState();
+
+	for (int i = 0; i < 9; ++i)
+	{
+		if (curGameState->isSpawned[i])//만약 현재 체크하는 구녕이 스폰이 된 상태라면
+		{
+			switch (curGameState->whichMole[i])
+			{
+			case 0:
+				Drones[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
+				auto coord = Holes[i].getPosition();
+				Drones[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
+				//[i]번 컨테이너의 [n]번 프레임의 알파값을 255로 설정해서 보이게한다.
+				break;
+			case 1:
+				Hydras[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
+				auto coord = Holes[i].getPosition();
+				Hydras[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
+				break;
+			case 2:
+				Zergs[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
+				auto coord = Holes[i].getPosition();
+				Zergs[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
+				break;
+			default:
+				break;
+			}
+			//case0은 드론, 1은 하이드라, 2는 저글링
+		}
+	}
 }
 
 void MainScene::handleEvnet(SDL_Event& e)
 {
+	bool isSelected = false;
+	if (e.type == SDL_MOUSEBUTTONUP)
+	{
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		int HoleWidth = 150;
+		int HoleHeight = 120;
+		//구멍 너비는 70
+		//길이는 120
+		for (int i = 0; i < Holes.size(); ++i)
+		{
+			auto coord = Holes[i].getPosition();
+			if ((coord.first < x && x < coord.first + HoleWidth) && (coord.second < y && y < coord.second + HoleHeight))
+			{
+				gFramework->setClientToServer(i, std::chrono::high_resolution_clock::now());
+				isSelected = true;
+			}
+		}
+	}
+	if (!isSelected)
+		gFramework->setClientToServer(INT_MAX, std::chrono::high_resolution_clock::now());
+	//만약 구멍을 선택하지 않았다면 INT_MAX값을 채워서 서버에게 넘겨준다.
 }
