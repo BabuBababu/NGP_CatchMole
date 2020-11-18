@@ -3,37 +3,30 @@
 HANDLE hStdin;
 DWORD fdwSaveOldMode;
 
+BOOL onConsoleEvent(DWORD event)
+{
+	switch (event)
+	{
+	case CTRL_C_EVENT:
+	case CTRL_CLOSE_EVENT:
+		TotalManager::isGameOver = true;
+		break;
+	default:
+		break;
+	}
+	return TRUE;
+}
+
 int main()
 {
 	TotalManager manager;
-	/*for (auto& thread :TotalManager::threads)
-	{
-		thread.join();
-	}*/
-
-	DWORD cNumRead, fdwMode;
-	INPUT_RECORD irInBuf[4];
-
-	hStdin = GetStdHandle(STD_INPUT_HANDLE);
-
-	fdwMode = ENABLE_WINDOW_INPUT;
 
 	while (!TotalManager::isGameOver)
 	{
-		if (!ReadConsoleInput(hStdin, irInBuf, 4, &cNumRead))
-			std::cout << "Error" << std::endl;
-
-		switch (irInBuf[0].EventType)
+		if (!SetConsoleCtrlHandler(onConsoleEvent, TRUE))
 		{
-		case KEY_EVENT:
-			std::cout << "KeyEventOccure" << std::endl;
-			TotalManager::isGameOver = true;
-			break;
-		default:
 			break;
 		}
-		
 	}
-	SetConsoleMode(hStdin, fdwSaveOldMode);
 	return 0;
 }
