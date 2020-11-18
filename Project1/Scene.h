@@ -50,8 +50,14 @@ private:
 	SimpleSDL::Image RedHammer;
 	//하위 목록은 벡터로
 
-	std::vector<SimpleSDL::Image> Hole[9];
+	std::vector<SimpleSDL::Image> Holes;
 	std::vector<SimpleSDL::Image> RedHammerAnimation;
+	std::vector<SimpleSDL::Image> Drones[2];
+	std::vector<SimpleSDL::Image> Hydras[2];
+	std::vector<SimpleSDL::Image> Zergs[2];
 
 	bool isRecvInitialPacket;
+
+	const int HoleNumber = 9;
+	const int HolePerLine = 3;
 };

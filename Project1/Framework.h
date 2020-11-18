@@ -16,6 +16,12 @@ public:
 	bool handleEvent();
 	bool update();
 	void changeScene(Scene* scene);
+	void setClientToServer(int clickedHole, std::chrono::high_resolution_clock::time_point tp)
+	{
+		ctos->clikedHole = clickedHole;
+		ctos->clikedTime = tp;
+	}
+	GameSate* getGameState() { return gs; }
 private:
 	Scene* curScene;
 	Communicator* communicator;

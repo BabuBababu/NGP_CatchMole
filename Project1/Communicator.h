@@ -9,7 +9,7 @@
 struct ClientToServer
 {
 	int clikedHole;
-	std::chrono::steady_clock::time_point clikedTime;
+	std::chrono::high_resolution_clock::time_point clikedTime;
 }typedef ClientToServer;
 #pragma pack()
 
@@ -21,7 +21,14 @@ struct GameSate
 	int p2Point;
 	int p1HammerFrame;
 	int p2HammerFrame;
-	std::pair<int, float> molespos[9];
+	bool isSpawned[9];
+	//각 구녕별로 스폰이 되었는지 확인한다
+	int whichMole[9];
+	//스폰이 되었다면 어떤 두더지 인지 확인한다
+	int whichContainer[9];
+	//어떤 두더지인지 확인되었다면 0,1번 그림 컨테이너 중 무엇을 고를것인가
+	int whichFrame[9];
+	//여기까지 됐으면 몇 번 프레임을 그려야 하는가
 }typedef GameState;
 #pragma pack()
 
