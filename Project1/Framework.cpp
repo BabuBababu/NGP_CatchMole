@@ -10,6 +10,7 @@ Framework::Framework(Scene* initScene)
 	gs = new GameSate();
 	communicator = new Communicator();
 	isGameStart = false;
+	isGameEnd = false;
 }
 //프레임워크의 생성자에서 SDL 시스템을 사용하기 위한 초기화 작업과
 //게임이 최초 시작시 진입할 씬을 지정하고, 구조체를 위한 메모리를 할당받는다.
@@ -22,7 +23,7 @@ Framework::~Framework()
 	delete ctos;
 	ctos = nullptr;
 	delete gs;
-	gs = nullptr;	
+	gs = nullptr;
 	delete communicator;
 	communicator = nullptr;
 }
@@ -59,7 +60,7 @@ bool Framework::recvInitialPacketFromServer()
 	return isGameStart;
 }
 
-bool Framework::connectingToServ(const std::string& servAddr,const std::string& portNum)
+bool Framework::connectingToServ(const std::string& servAddr, const std::string& portNum)
 {
 	if (!communicator->connectToServ(servAddr, portNum)) return false;
 	return true;
@@ -71,13 +72,16 @@ bool Framework::handleEvent()
 	SDL_Event e;
 	while (SDL_PollEvent(&e))
 	{
-		if (e.type == SDL_QUIT||e.key.keysym.sym==SDLK_q)
+		if (e.type == SDL_QUIT)
 		{
 			return true;
 		}
-		for (auto& box : SimpleSDL::EditBox::boxes)
+		if (!isGameStart)
 		{
-			box->handleEvent(e);
+			for (auto& box : SimpleSDL::EditBox::boxes)
+			{
+				box->handleEvent(e);
+			}
 		}
 		curScene->handleEvnet(e);
 	}
@@ -90,19 +94,25 @@ bool Framework::handleEvent()
 
 bool Framework::update()
 {
-	if (handleEvent()) return true;
-	//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
-	/*if (isGameStart)
-		if (!communicateWithServ()) return true;*/
-	//서버와 통신을 수행한다.
-	//아직 서버단에서 클라이언트 처리 코드를 넣지 않았기때문에
-	//잠시 주석처리한다.
+	if (!isGameEnd)
+	{
+		if (handleEvent())
+			return true;
+		//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
+		if (isGameStart)
+			if (!communicateWithServ())
+				return true;
+		//서버와 통신을 수행한다.
+		//아직 서버단에서 클라이언트 처리 코드를 넣지 않았기때문에
+		//잠시 주석처리한다.
 
-	updateScene();
-	//서버에게 받은 게임스테이트를 통해 씬을 업데이트한다.
-	render();
-	//화면에 그린다.
-	return false;
+		updateScene();
+		//서버에게 받은 게임스테이트를 통해 씬을 업데이트한다.
+		render();
+		//화면에 그린다.
+		return false;
+	}
+	return true;
 }
 //update할 땐 사용자 입력을 처리하고, 서버와 통신을 통해 업데이트 정보를 받아온 후
 //씬을 업데이트하고 화면에 그린다.
