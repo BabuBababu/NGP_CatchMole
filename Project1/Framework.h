@@ -21,6 +21,8 @@ public:
 		ctos->clikedHole = clickedHole;
 		ctos->clikedTime = tp;
 	}
+	void setIsGameEnd(bool var) { isGameEnd = var; }
+
 	GameSate* getGameState() { return gs; }
 private:
 	Scene* curScene;
@@ -28,6 +30,7 @@ private:
 	ClientToServer* ctos;
 	GameSate* gs;
 	bool isGameStart;
+	bool isGameEnd;
 };
 
 extern Framework* gFramework;

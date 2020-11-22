@@ -63,12 +63,12 @@ void InitScene::handleEvnet(SDL_Event& e)
 }
 
 
-
-MainScene::MainScene(): BG(0,0,0,0,0,255,"resource/BackGround.jpg"), RedHammer(0,0,0,0,0,255,"resource/RedHammer.png"),isRecvInitialPacket(false)
+MainScene::MainScene() : BG(0, 0, 0, 0, 0, 255, "resource/BackGround.jpg"), RedHammer(0, 0, 0, 0, 0, 255, "resource/RedHammer.png"), isRecvInitialPacket(false),
+timeFont(500, 0, 30, 0, 0, 0, 0, "textModel.ttf", "60"), myPoint(100, 0, 30, 0, 255, 0, 0, "textModel.ttf", "My Point: 0"),
+otherPoint(900, 0, 30, 255, 0, 0, 0, "textModel.ttf", "Other Point: 0"),
+watingMsg(100, 300, 100, 255, 0, 0, 0, "textModel.ttf", "Wating Another Player....")
 {
-	//int x, int y, int z, int w, int h, int alpha, std::string filePath
-	//하드코딩 양해좀
-	std::string Zerg[3] = {"Drone", "Zergling", "Hydra"};
+	std::string Zerg[3] = { "Drone", "Zergling", "Hydra" };
 	Holes.reserve(9);
 	Drones[0].reserve(2);
 	Hydras[0].reserve(2);
@@ -82,7 +82,7 @@ MainScene::MainScene(): BG(0,0,0,0,0,255,"resource/BackGround.jpg"), RedHammer(0
 	for (int i = 0; i < HoleNumber; ++i)
 	{
 		if (i % HolePerLine == 0) y += 250;
-		Holes.emplace_back(60 + i%HolePerLine * 500, y, 0, 0, 0, 255, "resource/hole.png");
+		Holes.emplace_back(60 + i % HolePerLine * 500, y, 0, 0, 0, 255, "resource/hole.png");
 	}
 
 	for (int i = 0; i < 2; ++i)
@@ -95,6 +95,7 @@ MainScene::MainScene(): BG(0,0,0,0,0,255,"resource/BackGround.jpg"), RedHammer(0
 		}
 	}
 	SDL_ShowCursor(SDL_DISABLE);
+	//마우스커서를 안 보이게 한다.
 }
 
 MainScene::~MainScene()
@@ -130,13 +131,26 @@ void MainScene::render()
 	}
 	//이미지를 백 버퍼에 다 그렸으면 그린 이미지는 알파값을 0으로
 	//설정해 보이지 않도록 한다.
+	timeFont.draw();
+	myPoint.draw();
+	otherPoint.draw();
+	if (!isRecvInitialPacket)
+		watingMsg.draw();
 }
 
 void MainScene::update()
 {
+	if (!isRecvInitialPacket)
+	{
+		isRecvInitialPacket = gFramework->recvInitialPacketFromServer();
+		if (isRecvInitialPacket)
+		{
+			isPlayer1 = gFramework->getGameState()->isPlayer1;
+		}
+	}
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	RedHammer.setPosition(x-100, y-75);
+	RedHammer.setPosition(x - 100, y - 75);
 	//망치를 그리고
 	GameState* curGameState = gFramework->getGameState();
 
@@ -144,22 +158,20 @@ void MainScene::update()
 	{
 		if (curGameState->isSpawned[i])//만약 현재 체크하는 구녕이 스폰이 된 상태라면
 		{
+			auto coord = Holes[i].getPosition();
 			switch (curGameState->whichMole[i])
 			{
 			case 0:
 				Drones[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
-				auto coord = Holes[i].getPosition();
 				Drones[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
 				//[i]번 컨테이너의 [n]번 프레임의 알파값을 255로 설정해서 보이게한다.
 				break;
 			case 1:
 				Hydras[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
-				auto coord = Holes[i].getPosition();
 				Hydras[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
 				break;
 			case 2:
 				Zergs[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
-				auto coord = Holes[i].getPosition();
 				Zergs[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setPosition(coord.first, coord.second);
 				break;
 			default:
@@ -168,6 +180,27 @@ void MainScene::update()
 			//case0은 드론, 1은 하이드라, 2는 저글링
 		}
 	}
+
+	if (gFramework->getGameState()->remainingTime > 0)
+	{
+		timeFont.changeText("Remaining Time: " + std::to_string(gFramework->getGameState()->remainingTime));
+		if (isPlayer1)
+		{
+			myPoint.changeText("My Point" + std::to_string(gFramework->getGameState()->p1Point));
+			otherPoint.changeText("Other Point" + std::to_string(gFramework->getGameState()->p2Point));
+		}
+		//내가 플레이어1이면 p1의 점수가 내 점수가 된다.
+		else
+		{
+			myPoint.changeText("My Point" + std::to_string(gFramework->getGameState()->p2Point));
+			otherPoint.changeText("Other Point" + std::to_string(gFramework->getGameState()->p1Point));
+		}
+	}
+	else
+	{
+		//엔딩신 추가해야함
+	}
+
 }
 
 void MainScene::handleEvnet(SDL_Event& e)
