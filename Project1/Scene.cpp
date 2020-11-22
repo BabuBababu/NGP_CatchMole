@@ -198,7 +198,28 @@ void MainScene::update()
 	}
 	else
 	{
-		//엔딩신 추가해야함
+		EndingScene* scene = new EndingScene();
+		if (isPlayer1)
+		{
+			if (gFramework->getGameState()->p1Point > gFramework->getGameState()->p2Point)
+				scene->setIsWin(true);
+			else if (gFramework->getGameState()->p1Point < gFramework->getGameState()->p2Point)
+				scene->setIsWin(false);
+			else
+				scene->setIsWin(true);
+			//비긴경우 모두 승리처리.
+		}
+		else
+		{
+			if (gFramework->getGameState()->p1Point > gFramework->getGameState()->p2Point)
+				scene->setIsWin(false);
+			else if (gFramework->getGameState()->p1Point < gFramework->getGameState()->p2Point)
+				scene->setIsWin(true);
+			else
+				scene->setIsWin(true);
+			//비긴경우 모두 승리처리.
+		}
+		gFramework->changeScene(scene);
 	}
 
 }
@@ -227,4 +248,38 @@ void MainScene::handleEvnet(SDL_Event& e)
 	if (!isSelected)
 		gFramework->setClientToServer(INT_MAX, std::chrono::high_resolution_clock::now());
 	//만약 구멍을 선택하지 않았다면 INT_MAX값을 채워서 서버에게 넘겨준다.
+}
+
+
+EndingScene::EndingScene() :winImg(300, 0, 0, 700, 600, 255, "resource/Win.png"),
+loseImg(300, 0, 0, 700, 600, 255, "resource/Lose.png"),
+text(400, 650, 50, 0, 0, 0, 0, "textModel.ttf", "Press Any Key To Quit")
+{
+}
+
+EndingScene::~EndingScene()
+{
+}
+
+void EndingScene::render()
+{
+	if (isWin)
+		winImg.draw();
+
+	else
+		loseImg.draw();
+	text.draw();
+}
+
+void EndingScene::update()
+{
+
+}
+
+void EndingScene::handleEvnet(SDL_Event& e)
+{
+	if (e.type == SDL_KEYDOWN)
+	{
+		gFramework->setIsGameEnd(true);
+	}
 }

@@ -49,15 +49,38 @@ private:
 	SimpleSDL::Image BG;
 	SimpleSDL::Image RedHammer;
 	//하위 목록은 벡터로
-
+	
 	std::vector<SimpleSDL::Image> Holes;
 	std::vector<SimpleSDL::Image> RedHammerAnimation;
 	std::vector<SimpleSDL::Image> Drones[2];
 	std::vector<SimpleSDL::Image> Hydras[2];
 	std::vector<SimpleSDL::Image> Zergs[2];
-
+	SimpleSDL::TTF timeFont;
+	SimpleSDL::TTF myPoint;
+	SimpleSDL::TTF otherPoint;
+	SimpleSDL::TTF watingMsg;
 	bool isRecvInitialPacket;
-
+	bool isPlayer1;
+	// 내가 플레이어1 인지 확인한다.
 	const int HoleNumber = 9;
 	const int HolePerLine = 3;
+};
+
+class EndingScene : public Scene
+{
+
+public:
+	EndingScene();
+	~EndingScene();
+	void render() override;
+	void update() override;
+	void handleEvnet(SDL_Event& e) override;
+	void setIsWin(bool var) { isWin = var; }
+private:
+	bool isWin;
+	SimpleSDL::Image winImg;
+	SimpleSDL::Image loseImg;
+	SimpleSDL::TTF text;
+	float remainingTime = 3.0f;
+	bool isOver = false;
 };
