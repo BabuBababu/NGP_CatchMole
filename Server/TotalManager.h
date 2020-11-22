@@ -11,6 +11,10 @@
 #pragma pack(1)
 struct ClientToServer
 {
+	ClientToServer()
+	{
+		clikedHole = INT_MAX;
+	}
 	int clikedHole;
 	std::chrono::high_resolution_clock::time_point clikedTime;
 }typedef ClientToServer;
@@ -19,6 +23,22 @@ struct ClientToServer
 #pragma pack(1)
 struct GameState
 {
+	GameState()
+	{
+		remainingTime = 10;
+		p1Point = 0;
+		p2Point = 0;
+		p1HammerFrame = 0;
+		p2HammerFrame = 0;
+		for (int i = 0; i < 9; ++i)
+		{
+			isSpawned[i] = false;
+			whichMole[i] = INT_MAX;
+			whichContainer[i] = INT_MAX;
+			whichFrame[i] = INT_MAX;
+		}
+		isPlayer1 = true;
+	}
 	int remainingTime;
 	int p1Point;
 	int p2Point;
@@ -32,6 +52,7 @@ struct GameState
 	//어떤 두더지인지 확인되었다면 0,1번 그림 컨테이너 중 무엇을 고를것인가
 	int whichFrame[9];
 	//여기까지 됐으면 몇 번 프레임을 그려야 하는가
+	bool isPlayer1;
 }typedef GameState;
 #pragma pack()
 
@@ -55,5 +76,9 @@ private:
 	static GameState* gs;
 	static ClientToServer* ctos;
 	static int portNumber;
-
+	static std::chrono::high_resolution_clock::time_point startT;
+	static std::chrono::high_resolution_clock::time_point endT;
+	static float elapsedTime;
+	static float accTime;
+	//초 단위임
 };
