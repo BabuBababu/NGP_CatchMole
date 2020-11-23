@@ -74,7 +74,7 @@ private:
 	static std::atomic<bool> isLogicThreadCompleted;
 	static std::atomic<bool> recvPacketFromClnt[2];
 	static GameState* gs;
-	static ClientToServer* ctos;
+	static ClientToServer* ctos[2];
 	static int portNumber;
 	static std::chrono::high_resolution_clock::time_point startT;
 	static std::chrono::high_resolution_clock::time_point endT;
