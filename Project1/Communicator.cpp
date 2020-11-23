@@ -32,8 +32,10 @@ bool Communicator::recvData(GameState* obj)
 bool Communicator::connectToServ(const std::string& servAddr, const std::string& portNum)
 {
 	clntSock = socket(PF_INET, SOCK_STREAM, 0);
-	int outTime = 1000;
+	int outTime = 2000;
 	setsockopt(clntSock, SOL_SOCKET, SO_RCVTIMEO, (char*)&outTime, sizeof(outTime));
+	int opt_val = TRUE;
+	setsockopt(clntSock, IPPROTO_TCP, TCP_NODELAY, (char*)&opt_val, sizeof(opt_val));
 	//1초간 수신받지 못 하면 종료한다.
 	SOCKADDR_IN addr;
 	ZeroMemory(&addr, sizeof(addr));

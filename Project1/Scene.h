@@ -47,7 +47,6 @@ public:
 	void handleEvnet(SDL_Event& e) override;
 private:
 	SimpleSDL::Image BG;
-	SimpleSDL::Image RedHammer;
 	//하위 목록은 벡터로
 	
 	std::vector<SimpleSDL::Image> Holes;
@@ -59,6 +58,7 @@ private:
 	SimpleSDL::TTF myPoint;
 	SimpleSDL::TTF otherPoint;
 	SimpleSDL::TTF watingMsg;
+	SimpleSDL::Music BGM;
 	bool isRecvInitialPacket;
 	bool isPlayer1;
 	// 내가 플레이어1 인지 확인한다.

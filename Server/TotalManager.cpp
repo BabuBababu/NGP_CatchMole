@@ -71,6 +71,8 @@ TotalManager::TotalManager()
 		int clntAddrSize = sizeof(SOCKADDR_IN);
 		ZeroMemory(&clntAddr, sizeof(clntAddr));
 		clntSock[connectedClientNum] = accept(listenSock, (SOCKADDR*)&clntAddr, &clntAddrSize);
+		int opt_val = TRUE;
+		setsockopt(clntSock[connectedClientNum], IPPROTO_TCP, TCP_NODELAY, (char*)&opt_val, sizeof(opt_val));
 
 		if (clntSock[connectedClientNum] == INVALID_SOCKET)
 			std::cout << "Connection error" << std::endl;
@@ -118,26 +120,44 @@ void TotalManager::gameLogicThread()
 	//[1][1]이 false 이면 히드라의 2번 이미지 컨테이너가 사용가능하단 소리다.
 	//[2][0]이 false 이면 저글링의 1번 이미지 컨테이너가 사용가능하단 소리다.
 
-	const float TIME_PER_ACTION = 0.5f;
+	const float TIME_PER_ACTION = 0.7f;
 	const float ACTION_PER_TIME = 1.0f / TIME_PER_ACTION;
 	const int FRAMES_PER_ACTION = 3;
+	const float TIME_PER_ACTION_HAMMER = 0.2f;
+	const float ACTION_PER_TIME_HAMMER = 1.0f / TIME_PER_ACTION_HAMMER;
+	
 
 	float moleFrames[9];
 	ZeroMemory(moleFrames, sizeof(float) * 9);
 	bool isBackAnim[9];
 	ZeroMemory(isBackAnim, sizeof(bool) * 9);
 
+	float hammerFrames[2];
+	ZeroMemory(hammerFrames, sizeof(float) * 2);
+	bool isHammerAnimPlaying[2] = { false,false };
+
 	while (1)
 	{
 		startT = std::chrono::high_resolution_clock::now();
 		while (1)
 		{
-			if (recvPacketFromClnt[0]) break;// && recvPacketFromClnt[1]) break;
+			if (recvPacketFromClnt[0] && recvPacketFromClnt[1]) break;
 		}
 
 		//###################################################################################################
 		int p1ClickedHole = p1ClickedHole = ctos[0]->clikedHole;
 		int p2ClickedHole = p2ClickedHole = ctos[1]->clikedHole;
+
+		if (p1ClickedHole != INT_MAX && !isHammerAnimPlaying[0])
+		{
+			isHammerAnimPlaying[0] = true;
+			hammerFrames[0] = 0;
+		}
+		if (p2ClickedHole != INT_MAX && !isHammerAnimPlaying[1])
+		{
+			isHammerAnimPlaying[1] = true;
+			hammerFrames[1] = 0;
+		}
 
 		if (p1ClickedHole != INT_MAX && (p1ClickedHole == p2ClickedHole) && gs->isSpawned[p1ClickedHole])
 		{
@@ -179,8 +199,8 @@ void TotalManager::gameLogicThread()
 				gs->whichMole[p2ClickedHole] = INT_MAX;
 				gs->whichFrame[p2ClickedHole] = 0;
 				currentMole -= 1;
-				moleFrames[p1ClickedHole] = 0;
-				isBackAnim[p1ClickedHole] = false;
+				moleFrames[p2ClickedHole] = 0;
+				isBackAnim[p2ClickedHole] = false;
 			}
 		}
 		//만약 p1과 p2가 INT_MAX가 아니면서 동일한 구멍을 골랐다면 누가 더 빨리 눌럿나확인하고 점수를 준다.
@@ -225,6 +245,24 @@ void TotalManager::gameLogicThread()
 				}
 			}
 		}
+		for (int i = 0 ; i <2 ; ++i)
+		{
+			if (isHammerAnimPlaying[i])
+			{
+				hammerFrames[i] += (FRAMES_PER_ACTION * ACTION_PER_TIME_HAMMER * elapsedTime);
+				if (hammerFrames[i] >= 2.4)
+				{
+					hammerFrames[i] = 0.0f;
+					isHammerAnimPlaying[i] = false;
+				}
+				if(i==0)
+					gs->p1HammerFrame = int(floorf(hammerFrames[i]));
+				else
+					gs->p2HammerFrame = int(floorf(hammerFrames[i]));
+			}
+		}
+		
+		
 		//###################################################################################################
 		//소환된 두더지의 애니메이션을 진행시킨다.
 
@@ -348,7 +386,7 @@ void TotalManager::clntProcessingThread(int threadID)
 		recvPacketFromClnt[threadID] = false;
 		while (true)
 		{
-			if (!recvPacketFromClnt[0]) break;//&& !recvPacketFromClnt[1]) break;
+			if (!recvPacketFromClnt[0] && !recvPacketFromClnt[1]) break;
 		}
 		if (!isGameOver)
 			send(clntSock[threadID], (char*)gs, sizeof(GameState), 0);
