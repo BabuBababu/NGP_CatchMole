@@ -63,11 +63,15 @@ void InitScene::handleEvnet(SDL_Event& e)
 }
 
 
-MainScene::MainScene() : BG(0, 0, 0, 0, 0, 255, "resource/BackGround.jpg"), RedHammer(0, 0, 0, 0, 0, 255, "resource/RedHammer.png"), isRecvInitialPacket(false),
+MainScene::MainScene() : BG(0, 0, 0, 0, 0, 255, "resource/BackGround.jpg"), isRecvInitialPacket(false),
 timeFont(500, 0, 30, 0, 0, 0, 0, "textModel.ttf", "60"), myPoint(100, 0, 30, 0, 255, 0, 0, "textModel.ttf", "My Point: 0"),
 otherPoint(900, 0, 30, 255, 0, 0, 0, "textModel.ttf", "Other Point: 0"),
-watingMsg(100, 300, 100, 255, 0, 0, 0, "textModel.ttf", "Wating Another Player....")
+watingMsg(100, 300, 100, 255, 0, 0, 0, "textModel.ttf", "Wating Another Player...."),
+BGM(("resource/BGM.mp3"),SimpleSDL::SOUNDVOLUME::MEDIUM)
 {
+	RedHammerAnimation.emplace_back(0, 0, 0, 0,0, 255, "resource/RedHammer.png");
+	RedHammerAnimation.emplace_back(0, 0, 0, 0,0, 255, "resource/RedHammer (1).png");
+	RedHammerAnimation.emplace_back(0, 0, 0, 0,0, 255, "resource/RedHammer (2).png");
 	std::string Zerg[3] = { "Drone", "Zergling", "Hydra" };
 	Holes.reserve(9);
 	Drones[0].reserve(2);
@@ -94,7 +98,7 @@ watingMsg(100, 300, 100, 255, 0, 0, 0, "textModel.ttf", "Wating Another Player..
 			Zergs[i].emplace_back(0, 0, 0, 0, 0, 0, "resource/Zergling" + std::to_string(j + 1) + ".png");
 		}
 	}
-	SDL_ShowCursor(SDL_DISABLE);
+	//SDL_ShowCursor(SDL_DISABLE);
 	//마우스커서를 안 보이게 한다.
 }
 
@@ -105,7 +109,8 @@ MainScene::~MainScene()
 void MainScene::render()
 {
 	BG.draw();
-	RedHammer.draw();
+	//RedHammer.draw();
+	
 
 	for (int i = 0; i < Holes.size(); ++i)
 		Holes[i].draw();
@@ -131,6 +136,10 @@ void MainScene::render()
 	}
 	//이미지를 백 버퍼에 다 그렸으면 그린 이미지는 알파값을 0으로
 	//설정해 보이지 않도록 한다.
+	if (isPlayer1)
+		RedHammerAnimation[gFramework->getGameState()->p1HammerFrame].draw();
+	else
+		RedHammerAnimation[gFramework->getGameState()->p2HammerFrame].draw();
 	timeFont.draw();
 	myPoint.draw();
 	otherPoint.draw();
@@ -150,7 +159,11 @@ void MainScene::update()
 	}
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	RedHammer.setPosition(x - 100, y - 75);
+	if (isPlayer1)
+		RedHammerAnimation[gFramework->getGameState()->p1HammerFrame].setPosition(x - 100, y - 75);
+	else
+		RedHammerAnimation[gFramework->getGameState()->p2HammerFrame].setPosition(x - 100,y -75);
+	//RedHammer.setPosition(x - 100, y - 75);
 	//망치를 그리고
 	GameState* curGameState = gFramework->getGameState();
 
@@ -238,7 +251,7 @@ void MainScene::handleEvnet(SDL_Event& e)
 		for (int i = 0; i < Holes.size(); ++i)
 		{
 			auto coord = Holes[i].getPosition();
-			if ((coord.first < x && x < coord.first + HoleWidth) && (coord.second < y && y < coord.second + HoleHeight))
+			if ((coord.first-HoleWidth < x && x < coord.first + HoleWidth) && (coord.second - HoleHeight < y && y < coord.second + HoleHeight))
 			{
 				gFramework->setClientToServer(i, std::chrono::high_resolution_clock::now());
 				isSelected = true;
