@@ -37,9 +37,7 @@ bool SimpleSDL::init(int windowWidth, int windowHeight)
 		else
 		{
 			//Create renderer for window
-			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_SOFTWARE/*SDL_RENDERER_ACCELERATED*/);
-			//GPU를 사용해서 렌더링 할 경우 가끔씩 GPU사용률이 오버나서 종료가 되는 것 같음.
-			//그렇게 그래픽이 중요한 게임이 아니니 CPU로 렌더링함.(소프트웨어 렌더러)
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 			if (gRenderer == NULL)
 			{
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
@@ -145,7 +143,7 @@ SimpleSDL::Image::Image(const Image& other)
 	textureHeight = other.textureHeight;
 	imageLocation = other.imageLocation;
 
-	
+
 
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(imageLocation.c_str());
