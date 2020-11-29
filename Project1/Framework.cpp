@@ -96,6 +96,7 @@ bool Framework::update()
 {
 	if (!isGameEnd)
 	{
+		auto startT = std::chrono::high_resolution_clock::now();
 		if (handleEvent())
 			return true;
 		//핸들 이벤트를 통해 언제 어떤 두더지를 눌렀는지 검사하고 그 정보를 ctos에 넣는다.
@@ -110,6 +111,10 @@ bool Framework::update()
 		//서버에게 받은 게임스테이트를 통해 씬을 업데이트한다.
 		render();
 		//화면에 그린다.
+		auto delay = 1000.0f / 60.0f - std::chrono::duration<float, std::milli>((std::chrono::high_resolution_clock::now()- startT)).count();
+		if (delay > 0)
+			Sleep(delay);
+		std::cout << 1.0f / (std::chrono::duration<float,std::milli>(std::chrono::high_resolution_clock::now() - startT ).count() / 1000.0f)<<std::endl;
 		return false;
 	}
 	return true;

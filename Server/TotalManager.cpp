@@ -141,31 +141,35 @@ void TotalManager::gameLogicThread()
 		startT = std::chrono::high_resolution_clock::now();
 		while (1)
 		{
-			if (recvPacketFromClnt[0] && recvPacketFromClnt[1]) break;
+			if (recvPacketFromClnt[0] && recvPacketFromClnt[1]) break; //클라 1과 클라2로부터 패킷을 받았으면 break (동기화 부분)
 		}
 
 		//###################################################################################################
 		int p1ClickedHole = p1ClickedHole = ctos[0]->clikedHole;
 		int p2ClickedHole = p2ClickedHole = ctos[1]->clikedHole;
+		//만약에 구멍 클릭 안했으면 INT_MAX를 받아온다.
+		//클라1,2로부터 받은정보를 따로 저장한다.
 
-		if (p1ClickedHole != INT_MAX && !isHammerAnimPlaying[0])
+		if (p1ClickedHole != INT_MAX && !isHammerAnimPlaying[0])  //p1이 구멍클릭했는데 해머애니메이션 플레이중이 아니라면
 		{
 			isHammerAnimPlaying[0] = true;
 			hammerFrames[0] = 0;
+			//망치 애니메이션 동작할수있도록 초기화
 		}
-		if (p2ClickedHole != INT_MAX && !isHammerAnimPlaying[1])
+		if (p2ClickedHole != INT_MAX && !isHammerAnimPlaying[1]) //p2이 구멍클릭했는데 해머애니메이션 플레이중이 아니라면
 		{
 			isHammerAnimPlaying[1] = true;
 			hammerFrames[1] = 0;
 		}
 
-		if (p1ClickedHole != INT_MAX && (p1ClickedHole == p2ClickedHole) && gs->isSpawned[p1ClickedHole])
+		if (p1ClickedHole != INT_MAX && (p1ClickedHole == p2ClickedHole) && gs->isSpawned[p1ClickedHole]) //둘다 같은 구멍 클릭했을때 두더지가 있던 구멍이면 비교
 		{
-			if (ctos[0]->clikedTime < ctos[1]->clikedTime)
+			if (ctos[0]->clikedTime < ctos[1]->clikedTime)// 시간정보를 이용한다.
 				gs->p1Point += 1;
 			else
 				gs->p2Point += 1;
 
+			//점수를 gs에 넘겨줬으면 다시 gs 초기화
 			gs->isSpawned[p1ClickedHole] = false;
 			whichMoleAndContainer[gs->whichMole[p1ClickedHole]][gs->whichFrame[p1ClickedHole]] = false;
 			gs->whichMole[p1ClickedHole] = INT_MAX;
@@ -177,10 +181,12 @@ void TotalManager::gameLogicThread()
 		}
 		else
 		{
-			if (p1ClickedHole != INT_MAX && gs->isSpawned[p1ClickedHole])
+			if (p1ClickedHole != INT_MAX && gs->isSpawned[p1ClickedHole]) //p1이 구멍 클릭했을때 두더지가 있던 구멍이면
 			{
 				//std::cout << "mole die at" << p1ClickedHole << " and mole sp: " << gs->whichMole[p1ClickedHole] << " and cont: " << gs->whichContainer[p1ClickedHole] << std::endl;
 				gs->p1Point += 1;
+				
+				//점수를 gs에 넘겨줬으면 다시 gs초기화
 				gs->isSpawned[p1ClickedHole] = false;
 				whichMoleAndContainer[gs->whichMole[p1ClickedHole]][gs->whichContainer[p1ClickedHole]] = false;
 				gs->whichMole[p1ClickedHole] = INT_MAX;
@@ -190,10 +196,12 @@ void TotalManager::gameLogicThread()
 				moleFrames[p1ClickedHole] = 0;
 				isBackAnim[p1ClickedHole] = false;
 			}
-			if (p2ClickedHole != INT_MAX && gs->isSpawned[p2ClickedHole])
+			if (p2ClickedHole != INT_MAX && gs->isSpawned[p2ClickedHole]) //p2가 구멍을 클릭했을때 두더지가 있던 구멍이면
 			{
 				//std::cout << "mole die at" << p1ClickedHole << " and mole sp: " << gs->whichMole[p1ClickedHole] << " and cont: " << gs->whichContainer[p1ClickedHole] << std::endl;
 				gs->p2Point += 1;
+				
+				//점수를 gs에 넘겨줬으면 다시 gs초기화
 				gs->isSpawned[p2ClickedHole] = false;
 				whichMoleAndContainer[gs->whichMole[p2ClickedHole]][gs->whichContainer[p2ClickedHole]] = false;
 				gs->whichMole[p2ClickedHole] = INT_MAX;
@@ -203,9 +211,7 @@ void TotalManager::gameLogicThread()
 				isBackAnim[p2ClickedHole] = false;
 			}
 		}
-		//만약 p1과 p2가 INT_MAX가 아니면서 동일한 구멍을 골랐다면 누가 더 빨리 눌럿나확인하고 점수를 준다.
-		//그렇지 않다면 각자 누른 구멍에 따라 점수를 준다.
-		//이때 주의할 점은 두더지가 스폰이 됐는지 안됐는지를 확인해야한다는 점이다.
+		
 		//###################################################################################################
 		//여기까지 유저가 보낸 패킷을 기반으로 두더지를 잡는 로직이다.
 
@@ -281,21 +287,22 @@ void TotalManager::gameLogicThread()
 			std::random_shuffle(candidates.begin(), candidates.end());
 			int selectedHole;
 			selectedHole = candidates[0];
-			//랜덤으로 섞인 후보군에서 앞에 2개를 뽑아 해당 구멍에 두더지를 소환할 것이다.
+			//랜덤으로 섞인 후보군에서 앞에 1개를 뽑아 해당 구멍에 두더지를 소환할 것이다.
 
 			int spawnedNum = 0;
 
-			int pickedMole = uid(dre);
+			int pickedMole = uid(dre); 
+			//두더지 종류를 (0~2)랜덤으로 고른다.
 
 			bool isSpawned = false;
-			if (!whichMoleAndContainer[pickedMole][0])
+			if (!whichMoleAndContainer[pickedMole][0]) //사용하지않는 상태
 			{
 				gs->isSpawned[selectedHole] = true;
 				gs->whichMole[selectedHole] = pickedMole;
 				gs->whichContainer[selectedHole] = 0;
 				gs->whichFrame[selectedHole] = 0;
-				//스폰이 됐으니 해당 구멍 스폰 true!
-				//그리고 pickedMole이 해당 구멍에 스폰되는 두더지!
+				//스폰이 됐으니 해당 구멍 스폰 true
+				//그리고 pickedMole이 해당 구멍에 스폰되는 두더지
 				//그리고 이미지 컨테이너는 0이된다.
 				//애니메이션 프레임은 0으로 설정한다!
 				whichMoleAndContainer[pickedMole][0] = true;
@@ -320,7 +327,7 @@ void TotalManager::gameLogicThread()
 			}
 			//if (spawnedNum == 1)break;
 			//두 마리 다 소환됐으면 소환을 마친다.
-
+			//만약 동일 두더지의 이미지 컨테이너를 모두 사용중이면 소환을 포기한다.
 			if (isSpawned)
 			{
 				currentMole += 1;
@@ -331,10 +338,8 @@ void TotalManager::gameLogicThread()
 		//###################################################################################################
 		//이곳에서 두더지를 소환한다.
 
-		//Sleep(50);
 
-		//게임로직처리대신 우선 슬립을 넣었음 슬립 부분을 게임로직으로 대체할것임.
-		/*auto delay = 1000.0f/600.0f - std::chrono::duration<float, std::milli>((startT - std::chrono::high_resolution_clock::now())).count();
+		/*auto delay = 1000.0f/300.0f - std::chrono::duration<float, std::milli>((startT - std::chrono::high_resolution_clock::now())).count();
 		if(delay>0)
 			Sleep(delay);*/
 		endT = std::chrono::high_resolution_clock::now();
@@ -359,6 +364,8 @@ void TotalManager::gameLogicThread()
 		}
 		//###################################################################################################
 		//게임시간을 감소시킨다.
+
+
 		isLogicThreadCompleted = true;
 		if (isGameOver)
 		{
