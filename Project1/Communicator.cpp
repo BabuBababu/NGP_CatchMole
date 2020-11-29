@@ -36,7 +36,7 @@ bool Communicator::connectToServ(const std::string& servAddr, const std::string&
 	setsockopt(clntSock, SOL_SOCKET, SO_RCVTIMEO, (char*)&outTime, sizeof(outTime));
 	int opt_val = TRUE;
 	setsockopt(clntSock, IPPROTO_TCP, TCP_NODELAY, (char*)&opt_val, sizeof(opt_val));
-	//1초간 수신받지 못 하면 종료한다.
+	//2초간 수신받지 못 하면 종료한다.
 	SOCKADDR_IN addr;
 	ZeroMemory(&addr, sizeof(addr));
 	addr.sin_family = PF_INET;

@@ -25,7 +25,7 @@ struct GameState
 {
 	GameState()
 	{
-		remainingTime = 60;
+		remainingTime = 30;
 		p1Point = 0;
 		p2Point = 0;
 		p1HammerFrame = 0;

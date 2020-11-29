@@ -169,10 +169,10 @@ void MainScene::update()
 
 	for (int i = 0; i < 9; ++i)
 	{
-		if (curGameState->isSpawned[i])//만약 현재 체크하는 구녕이 스폰이 된 상태라면
+		if (curGameState->isSpawned[i])//만약 현재 체크하는 구멍이 스폰이 된 상태라면
 		{
 			auto coord = Holes[i].getPosition();
-			switch (curGameState->whichMole[i])
+			switch (curGameState->whichMole[i])// i번째 구멍에 어떤 두더지인가?
 			{
 			case 0:
 				Drones[curGameState->whichContainer[i]][curGameState->whichFrame[i]].setAlphaValue(255);
@@ -190,7 +190,7 @@ void MainScene::update()
 			default:
 				break;
 			}
-			//case0은 드론, 1은 하이드라, 2는 저글링
+			//case0은 드론, 1은 히드라, 2는 저글링
 		}
 	}
 
@@ -254,6 +254,7 @@ void MainScene::handleEvnet(SDL_Event& e)
 			if ((coord.first-HoleWidth < x && x < coord.first + HoleWidth) && (coord.second - HoleHeight < y && y < coord.second + HoleHeight))
 			{
 				gFramework->setClientToServer(i, std::chrono::high_resolution_clock::now());
+				//구멍이 선택이 됐다면 서버에게 보낼 ctos구조체에 정보를 넣어준다.
 				isSelected = true;
 			}
 		}
